@@ -3,106 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Keja Yangu | Student Housing</title>
-    
+    <title>Keja Yangu | Official</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
     <style>
-        :root { --navy: #1a237e; --red: #d32f2f; --bg: #f4f7f9; --success: #25d366; --blue-tick: #2196F3; --gold: #ffc107; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; padding-bottom: 80px; }
-        .container { max-width: 500px; margin: 0 auto; }
-        
+        :root { --navy: #1a237e; --red: #d32f2f; --bg: #f4f7f9; --blue: #2196F3; --gold: #ffc107; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; padding-bottom: 100px; }
         .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: none; margin-bottom: 20px; }
         input, select, .btn { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
         .btn-primary { background: var(--navy); color: white; border: none; font-weight: bold; cursor: pointer; }
-        
-        /* Scam Warning */
-        .scam-banner { background: #fff3cd; color: #856404; padding: 10px; border-radius: 10px; font-size: 0.8rem; border: 1px solid #ffeeba; margin-bottom: 15px; text-align: center; }
-
-        /* House Card */
-        .house-card { background: white; border-radius: 18px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); position: relative; }
-        .house-img { width: 100%; height: 210px; object-fit: cover; }
+        .scam-banner { background: #fff3cd; color: #856404; padding: 10px; border-radius: 10px; font-size: 0.8rem; text-align: center; border: 1px solid #ffeeba; margin-bottom: 15px; }
+        .house-card { background: white; border-radius: 18px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .house-img { width: 100%; height: 210px; object-fit: cover; background: #eee; }
         .house-info { padding: 15px; }
         .price { color: var(--red); font-size: 1.3rem; font-weight: 800; }
-        
-        /* Interaction Icons */
-        .card-actions { display: flex; gap: 15px; margin: 10px 0; font-size: 1.2rem; }
-        .heart-icon { color: var(--red); cursor: pointer; }
-        .verified-tick { color: var(--blue-tick); margin-left: 5px; }
-
-        /* Reviews */
-        .review-section { background: #f9f9f9; padding: 10px; border-radius: 10px; margin-top: 10px; font-size: 0.85rem; }
-        .review-item { border-bottom: 1px solid #eee; padding: 5px 0; }
-
-        /* Admin Controls */
-        .admin-box { background: #fff; border: 2px solid gold; padding: 15px; border-radius: 15px; margin-top: 20px; }
-        .admin-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; padding: 8px 0; border-bottom: 1px solid #eee; }
-        
-        /* Tabs for Student */
-        .tabs { display: flex; gap: 10px; margin-bottom: 15px; }
-        .tab-btn { flex: 1; padding: 10px; border-radius: 10px; border: none; background: #ddd; cursor: pointer; }
-        .tab-active { background: var(--navy); color: white; }
-
-        footer { text-align: center; padding: 20px; font-size: 0.8rem; color: #777; }
+        .verified-tick { color: var(--blue); margin-left: 5px; font-size: 1rem; }
+        .admin-box { background: #fff; border: 2px solid var(--gold); padding: 15px; border-radius: 15px; margin-top: 20px; display: none; }
+        .admin-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 0.85rem; }
+        .tab-bar { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tab { flex: 1; padding: 10px; text-align: center; background: #ddd; border-radius: 10px; cursor: pointer; font-size: 0.9rem; }
+        .tab.active { background: var(--navy); color: white; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div style="text-align:center; padding: 10px;">
-        <img src="https://i.ibb.co/3mKNG8nV/House-logo.png" style="width:70px; border-radius:10px;">
-        <h2 style="color:var(--navy); margin:5px 0;">KEJA YANGU</h2>
+<div style="max-width:500px; margin: 0 auto;">
+    <div style="text-align:center; padding: 20px 0;">
+        <h2 style="color:var(--navy); margin:0;">KEJA YANGU</h2>
+        <small id="user-tag" style="color:var(--blue); font-weight:bold;"></small>
     </div>
 
     <div id="auth-screen" class="card" style="display: block;">
-        <div class="scam-banner">⚠️ <strong>SECURITY ALERT:</strong> Never pay any deposit or booking fee before visiting the house. Payments are NOT done on this platform.</div>
+        <div class="scam-banner">📢 <b>Warning:</b> Never pay before viewing the house. We do not handle payments here.</div>
         <input type="email" id="email" placeholder="Email">
         <input type="password" id="pass" placeholder="Password">
         <select id="role">
-            <option value="student">Student</option>
-            <option value="landlord">Landlord</option>
+            <option value="student">I am a Student</option>
+            <option value="landlord">I am a Landlord</option>
         </select>
-        <button onclick="authAction('login')" class="btn btn-primary">Sign In</button>
-        <button onclick="authAction('signup')" class="btn" style="background:none; border:1px solid var(--navy);">Register</button>
+        <button onclick="authAction('login')" class="btn btn-primary">Login</button>
+        <button onclick="authAction('signup')" class="btn" style="background:none; border:1px solid var(--navy);">Create Account</button>
     </div>
 
-    <div id="student-screen" class="card">
-        <div class="tabs">
-            <button id="tab-all" class="tab-btn tab-active" onclick="switchTab('all')">All Houses</button>
-            <button id="tab-liked" class="tab-btn" onclick="switchTab('liked')">My Likes ❤️</button>
+    <div id="market-screen" class="card">
+        <div class="tab-bar">
+            <div id="tab-all" class="tab active" onclick="switchTab('all')">All Houses</div>
+            <div id="tab-liked" class="tab" onclick="switchTab('liked')">My Likes ❤️</div>
         </div>
-        
-        <div class="scam-banner">🚫 NO online payments. Visit the house first!</div>
-        <input type="text" id="search" placeholder="🔍 Search houses..." onkeyup="drawMarket()">
-        
-        <div id="market-list"></div>
+        <input type="text" id="search" placeholder="🔍 Search by name..." onkeyup="drawMarket()">
+        <div id="market-list">Loading houses...</div>
 
-        <div id="admin-panel" style="display:none;" class="admin-box">
-            <h4 style="margin-top:0;">🛡️ Admin Control Room</h4>
+        <div id="admin-panel" class="admin-box">
+            <h4 style="margin:0 0 10px 0;">🛡️ Admin: Manage Landlords</h4>
             <div id="admin-user-list"></div>
-            <hr>
-            <div id="admin-reports"></div>
         </div>
-
-        <button onclick="auth.signOut()" class="btn" style="color:var(--red); border:none; background:none; font-weight:bold;">Logout</button>
+        
+        <button onclick="auth.signOut()" class="btn" style="margin-top:20px; color:var(--red); border:none; background:none; font-weight:bold;">Logout</button>
     </div>
 
     <div id="landlord-screen" class="card">
-        <h3>Post House</h3>
+        <h3>Post Property</h3>
         <input type="text" id="h-name" placeholder="House Name">
-        <input type="number" id="h-price" placeholder="Price">
+        <input type="number" id="h-price" placeholder="Rent per Month">
         <input type="text" id="h-phone" placeholder="WhatsApp Number">
-        <input type="text" id="h-dist" placeholder="Distance (e.g. 500m)">
+        <input type="text" id="h-dist" placeholder="Distance from school">
         <input type="text" id="h-img" placeholder="Image URL">
-        <button onclick="saveHouse()" class="btn btn-primary">Publish</button>
+        <button onclick="saveHouse()" class="btn btn-primary">Publish Listing</button>
         <hr>
-        <div id="landlord-list"></div>
+        <h4>Your Listings</h4>
+        <div id="my-listings"></div>
         <button onclick="auth.signOut()" class="btn" style="color:var(--red); border:none; background:none;">Logout</button>
     </div>
-
-    <footer>&copy; 2025 Keja Yangu Murang'a</footer>
 </div>
 
 <script>
@@ -119,42 +91,44 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    let houses = [];
-    let usersMap = {};
-    let myLikes = [];
-    let currentTab = 'all';
+    let allHouses = [], usersMap = {}, myLikes = [], currentTab = 'all';
 
     auth.onAuthStateChanged(async user => {
         document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
         if(!user) {
             document.getElementById('auth-screen').style.display = 'block';
         } else {
-            // Everyone uses the Student screen to view, including Admin
-            const userDoc = await db.collection('users').doc(user.uid).get();
-            const role = userDoc.exists ? userDoc.data().role : 'student';
+            const doc = await db.collection('users').doc(user.uid).get();
+            const userData = doc.data() || { role: 'student' };
             
-            if(user.email === ADMIN_EMAIL || role === 'student') {
-                document.getElementById('student-screen').style.display = 'block';
-                if(user.email === ADMIN_EMAIL) {
-                    document.getElementById('admin-panel').style.display = 'block';
-                    loadAdminData();
-                }
-            } else {
+            if(user.email === ADMIN_EMAIL) {
+                document.getElementById('market-screen').style.display = 'block';
+                document.getElementById('admin-panel').style.display = 'block';
+                document.getElementById('user-tag').innerText = "ADMIN MODE";
+                loadAdminTools();
+            } else if(userData.role === 'landlord') {
                 document.getElementById('landlord-screen').style.display = 'block';
+                document.getElementById('user-tag').innerText = "LANDLORD";
+            } else {
+                document.getElementById('market-screen').style.display = 'block';
+                document.getElementById('user-tag').innerText = "STUDENT";
             }
-            loadBaseData();
+            startListeners();
         }
     });
 
-    function loadBaseData() {
+    function startListeners() {
+        // Listen for all users (to get verification status)
         db.collection('users').onSnapshot(snap => {
-            snap.forEach(doc => usersMap[doc.id] = doc.data());
-            db.collection('houses').orderBy('createdAt', 'desc').onSnapshot(hSnap => {
-                houses = hSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            snap.forEach(d => usersMap[d.id] = d.data());
+            // Once users are loaded, listen for houses
+            db.collection('houses').onSnapshot(hSnap => {
+                allHouses = hSnap.docs.map(d => ({ id: d.id, ...d.data() }));
                 drawMarket();
-                if(document.getElementById('landlord-list')) drawLandlordList();
+                if(document.getElementById('my-listings')) drawLandlordList();
             });
         });
+        // Listen for current user's likes
         db.collection('likes').doc(auth.currentUser.uid).onSnapshot(doc => {
             myLikes = doc.exists ? doc.data().houseIds : [];
             drawMarket();
@@ -163,113 +137,83 @@
 
     function drawMarket() {
         const list = document.getElementById('market-list');
-        const query = document.getElementById('search').value.toLowerCase();
+        const searchTerm = document.getElementById('search').value.toLowerCase();
         list.innerHTML = "";
 
-        houses.filter(h => {
-            const matchesSearch = h.name.toLowerCase().includes(query);
+        const filtered = allHouses.filter(h => {
+            const matchesSearch = h.name.toLowerCase().includes(searchTerm);
             const matchesTab = (currentTab === 'all') || (currentTab === 'liked' && myLikes.includes(h.id));
             return matchesSearch && matchesTab;
-        }).forEach(h => {
+        });
+
+        if(filtered.length === 0) list.innerHTML = "<p style='text-align:center; color:#888;'>No houses found.</p>";
+
+        filtered.forEach(h => {
             const isV = usersMap[h.ownerId]?.isVerified;
             const isLiked = myLikes.includes(h.id);
             const isAdmin = auth.currentUser.email === ADMIN_EMAIL;
 
             list.innerHTML += `
                 <div class="house-card">
-                    <img src="${h.img || ''}" class="house-img">
+                    <img src="${h.img || 'https://via.placeholder.com/400x200?text=No+Image'}" class="house-img">
                     <div class="house-info">
-                        <div style="display:flex; justify-content:space-between;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
                             <span class="price">Ksh ${h.price}</span>
-                            <span>${h.name} ${isV ? '<b class="verified-tick">✔</b>' : ''}</span>
+                            <strong>${h.name} ${isV ? '<span class="verified-tick">✔</span>' : ''}</strong>
                         </div>
-                        <div class="card-actions">
-                            <span onclick="toggleLike('${h.id}')" class="heart-icon">${isLiked ? '❤️' : '🤍'}</span>
+                        <div style="margin: 10px 0; display:flex; gap:15px; font-size:1.3rem;">
+                            <span onclick="toggleLike('${h.id}')" style="cursor:pointer;">${isLiked ? '❤️' : '🤍'}</span>
                             <a href="https://wa.me/${h.phone}" style="text-decoration:none;">💬</a>
-                            ${isAdmin ? `<button onclick="deleteListing('${h.id}')" style="background:none; border:none; color:red; cursor:pointer;">🗑️ Delete</button>` : ''}
+                            ${isAdmin ? `<span onclick="deleteHouse('${h.id}')" style="cursor:pointer; font-size:1rem; color:red; margin-left:auto;">🗑️ Delete</span>` : ''}
                         </div>
-                        <div style="font-size:0.8rem; color:#666;">📍 ${h.dist}</div>
-                        
-                        <div class="review-section">
-                            <input type="text" id="rev-${h.id}" placeholder="Write a review..." style="padding:5px; font-size:0.7rem; width:70%;">
-                            <button onclick="addReview('${h.id}')" style="width:25%; font-size:0.7rem; padding:5px;">Post</button>
-                            <div id="reviews-${h.id}">Loading reviews...</div>
-                        </div>
+                        <div style="font-size:0.8rem; color:#666;">📍 ${h.dist} from campus</div>
                     </div>
                 </div>`;
-            loadReviews(h.id);
         });
     }
 
-    // INTERACTION LOGIC
     async function toggleLike(hid) {
-        let newLikes = [...myLikes];
-        if(newLikes.includes(hid)) newLikes = newLikes.filter(id => id !== hid);
-        else newLikes.push(hid);
+        let newLikes = myLikes.includes(hid) ? myLikes.filter(id => id !== hid) : [...myLikes, hid];
         await db.collection('likes').doc(auth.currentUser.uid).set({ houseIds: newLikes });
     }
 
-    async function addReview(hid) {
-        const txt = document.getElementById('rev-'+hid).value;
-        if(!txt) return;
-        await db.collection('houses').doc(hid).collection('reviews').add({
-            text: txt,
-            user: auth.currentUser.email,
-            createdAt: new Date()
-        });
-        document.getElementById('rev-'+hid).value = "";
-    }
-
-    function loadReviews(hid) {
-        db.collection('houses').doc(hid).collection('reviews').orderBy('createdAt','desc').limit(3).onSnapshot(snap => {
-            const div = document.getElementById('reviews-'+hid);
-            div.innerHTML = "";
-            snap.forEach(doc => {
-                div.innerHTML += `<div class="review-item"><b>${doc.data().user.split('@')[0]}:</b> ${doc.data().text}</div>`;
-            });
-        });
-    }
-
-    // ADMIN DASHBOARD LOGIC
-    function loadAdminData() {
-        db.collection('users').where('role', '==', 'landlord').onSnapshot(snap => {
-            const list = document.getElementById('admin-user-list');
-            list.innerHTML = "<h5>Verify Landlords</h5>";
-            snap.forEach(doc => {
-                const u = doc.data();
-                list.innerHTML += `<div class="admin-row">
-                    <span>${u.email}</span>
-                    <button onclick="updateVerify('${doc.id}', ${!u.isVerified})">${u.isVerified ? '✅ Verified' : '❌ Unverified'}</button>
-                </div>`;
-            });
-        });
-    }
-
-    function updateVerify(uid, status) { db.collection('users').doc(uid).update({ isVerified: status }); }
-    function deleteListing(hid) { if(confirm("Delete this fake listing?")) db.collection('houses').doc(hid).delete(); }
-
-    // TAB LOGIC
     function switchTab(t) {
         currentTab = t;
-        document.getElementById('tab-all').className = t === 'all' ? 'tab-btn tab-active' : 'tab-btn';
-        document.getElementById('tab-liked').className = t === 'liked' ? 'tab-btn tab-active' : 'tab-btn';
+        document.getElementById('tab-all').className = t === 'all' ? 'tab active' : 'tab';
+        document.getElementById('tab-liked').className = t === 'liked' ? 'tab active' : 'tab';
         drawMarket();
     }
 
-    // BASE FUNCTIONS
     async function saveHouse() {
         const h = {
             name: document.getElementById('h-name').value,
             price: document.getElementById('h-price').value,
-            phone: document.getElementById('h-phone').value.replace(/\D/g,''),
+            phone: document.getElementById('h-phone').value,
             dist: document.getElementById('h-dist').value,
             img: document.getElementById('h-img').value,
             ownerId: auth.currentUser.uid,
-            createdAt: new Date()
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
         };
         await db.collection('houses').add(h);
-        alert("Posted!");
+        alert("Published!");
     }
+
+    function loadAdminTools() {
+        db.collection('users').where('role', '==', 'landlord').onSnapshot(snap => {
+            const list = document.getElementById('admin-user-list');
+            list.innerHTML = "";
+            snap.forEach(doc => {
+                const u = doc.data();
+                list.innerHTML += `<div class="admin-row">
+                    <span>${u.email}</span>
+                    <button onclick="toggleVerify('${doc.id}', ${!u.isVerified})">${u.isVerified ? '✅ Verified' : '❌ Unverified'}</button>
+                </div>`;
+            });
+        });
+    }
+
+    async function toggleVerify(uid, status) { await db.collection('users').doc(uid).update({ isVerified: status }); }
+    async function deleteHouse(hid) { if(confirm("Delete this listing?")) await db.collection('houses').doc(hid).delete(); }
 
     function authAction(type) {
         const e = document.getElementById('email').value, p = document.getElementById('pass').value, r = document.getElementById('role').value;
