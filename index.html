@@ -12,9 +12,9 @@
     <style>
         :root { --navy: #1a237e; --red: #d32f2f; --bg: #f4f7f9; --success: #25d366; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
-        .container { max-width: 500px; margin: 0 auto; }
+        .container { max-width: 500px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
         
-        /* Header & Logo Section */
+        /* Header */
         .header-brand { text-align: center; padding: 20px 0; }
         .logo-img { width: 120px; height: auto; border-radius: 15px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15)); }
         .brand-name { color: var(--navy); margin-top: 12px; font-weight: 800; font-size: 1.7rem; letter-spacing: 1px; }
@@ -22,17 +22,20 @@
         .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); display: none; margin-bottom: 20px; border: 1px solid #eee; }
         input, select, .btn { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; font-size: 1rem; }
         .btn-primary { background: var(--navy); color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
         
         /* Marketplace Layout */
-        .house-card { background: white; border-radius: 18px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; transition: 0.3s; }
-        .house-img { width: 100%; height: 230px; object-fit: cover; background: #eee; border-bottom: 1px solid #eee; }
+        .house-card { background: white; border-radius: 18px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; }
+        .house-img { width: 100%; height: 230px; object-fit: cover; background: #eee; }
         .house-info { padding: 18px; text-align: left; }
         .price { color: var(--red); font-size: 1.5rem; font-weight: 800; }
         
         .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
-        .btn-wa { background: var(--success); color: white; text-decoration: none; text-align: center; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 1rem; }
-        .btn-map { background: var(--navy); color: white; text-decoration: none; text-align: center; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 1rem; }
+        .btn-wa { background: var(--success); color: white; text-decoration: none; text-align: center; padding: 12px; border-radius: 10px; font-weight: bold; }
+        .btn-map { background: var(--navy); color: white; text-decoration: none; text-align: center; padding: 12px; border-radius: 10px; font-weight: bold; }
+
+        /* Footer */
+        footer { margin-top: auto; padding: 20px; text-align: center; font-size: 0.8rem; color: #888; }
+        footer a { color: var(--navy); text-decoration: none; margin: 0 10px; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -44,7 +47,7 @@
              alt="Keja Yangu Logo" 
              class="logo-img">
         <div class="brand-name">KEJA YANGU</div>
-        <p style="margin:0; font-size:0.9rem; color:#666; font-weight: 500;">Murang'a University Student Housing</p>
+        <p style="margin:0; font-size:0.9rem; color:#666;">Official Student Housing Portal</p>
     </div>
 
     <div id="auth-screen" class="card" style="display: block;">
@@ -60,7 +63,9 @@
     </div>
 
     <div id="student-screen" class="card">
-        <h3 style="margin-top:0;">Find Your Keja</h3>
+        <div style="background: #e8eaf6; padding: 10px; border-radius: 10px; margin-bottom: 15px; font-size: 0.8rem; border-left: 4px solid var(--navy);">
+            <strong>Quick Tip:</strong> Click WhatsApp to talk to owners directly!
+        </div>
         <input type="text" id="search" placeholder="🔍 Search name or area..." onkeyup="drawMarket()">
         <div id="market-list"></div>
         <button onclick="auth.signOut()" class="btn" style="color:var(--red); border:none; background:none; font-weight: bold;">Logout</button>
@@ -68,23 +73,28 @@
 
     <div id="landlord-screen" class="card">
         <h3 style="margin-top:0;">Landlord Dashboard</h3>
-        <div style="background:#f8f9fa; padding:15px; border-radius:15px; border:1px solid #eef;">
-            <h4 style="margin-top:0;">Post New Listing</h4>
-            <input type="text" id="h-name" placeholder="House Name">
-            <input type="number" id="h-price" placeholder="Monthly Rent (Ksh)">
-            <input type="text" id="h-dist" placeholder="Distance (e.g. 500m from gate)">
-            <input type="text" id="h-img" placeholder="Paste House Photo URL">
-            <input type="text" id="h-map" placeholder="Google Maps Link">
-            <input type="text" id="h-amen" placeholder="Amenities (WiFi, Water, CCTV)">
-            <button onclick="saveHouse()" class="btn btn-primary">Publish Property</button>
-        </div>
+        <input type="text" id="h-name" placeholder="House Name">
+        <input type="number" id="h-price" placeholder="Monthly Rent (Ksh)">
+        <input type="text" id="h-dist" placeholder="Distance (e.g. 500m from gate)">
+        <input type="text" id="h-img" placeholder="Paste Photo URL (ImgBB Direct Link)">
+        <input type="text" id="h-map" placeholder="Google Maps Link">
+        <input type="text" id="h-amen" placeholder="Amenities (WiFi, Water, etc)">
+        <button onclick="saveHouse()" class="btn btn-primary">Publish Property</button>
         <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
         <div id="landlord-list"></div>
         <button onclick="auth.signOut()" class="btn" style="color:var(--red); border:none; background:none; margin-top:20px;">Logout</button>
     </div>
+
+    <footer>
+        <p>&copy; 2025 Keja Yangu Murang'a</p>
+        <a href="#" onclick="alert('Keja Yangu is a marketplace connecting students and landlords. We are not responsible for transactions.')">Terms</a> | 
+        <a href="#" onclick="alert('Your data is secure and used only for account management.')">Privacy</a> |
+        <a href="https://wa.me/254720680769">Support</a>
+    </footer>
 </div>
 
 <script>
+    // --- FIREBASE CONFIG ---
     const firebaseConfig = {
         apiKey: "AIzaSyCC8SA7FKzikzHwvA9A6dyrv0x2jguyPPQ",
         authDomain: "murang-a-student-housing.firebaseapp.com",
@@ -125,13 +135,7 @@
         const container = document.getElementById('market-list');
         if(!container) return;
         container.innerHTML = "";
-
         const filtered = houses.filter(h => h.name.toLowerCase().includes(query));
-        if(filtered.length === 0) {
-            container.innerHTML = "<p style='color:#999; padding:20px;'>No properties found.</p>";
-            return;
-        }
-
         filtered.forEach(h => {
             container.innerHTML += `
                 <div class="house-card">
@@ -141,7 +145,7 @@
                             <strong style="font-size:1.2rem; color:var(--navy);">${h.name}</strong>
                             <span class="price">Ksh ${h.price}</span>
                         </div>
-                        <div style="color:#666; margin:8px 0; font-size:0.9rem;">📍 ${h.dist || 'Walking distance'}</div>
+                        <div style="color:#666; margin:8px 0; font-size:0.9rem;">📍 ${h.dist}</div>
                         <div class="action-row">
                             <a href="https://wa.me/254720680769?text=Hello, I am interested in ${h.name}" class="btn-wa">WhatsApp</a>
                             <a href="${h.map || '#'}" target="_blank" class="btn-map">Google Maps</a>
@@ -158,25 +162,23 @@
         const img = document.getElementById('h-img').value;
         const map = document.getElementById('h-map').value;
         const amenities = document.getElementById('h-amen').value;
-        if(!name || !price) return alert("Please enter both the name and price.");
-        
+        if(!name || !price) return alert("Fill Name and Price");
         await db.collection('houses').add({
             name, price, dist, img, map, amenities,
             ownerId: auth.currentUser.uid,
             createdAt: new Date()
         });
-        alert("Listing published successfully!");
+        alert("Listing published!");
         document.getElementById('h-name').value = "";
     }
 
     function drawLandlordList() {
         const list = document.getElementById('landlord-list');
-        list.innerHTML = "<h4>Your Properties</h4>";
-        const myHouses = houses.filter(h => h.ownerId === auth.currentUser.uid);
-        myHouses.forEach(h => {
-            list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:12px; border-bottom:1px solid #eee; background:#fff;">
-                <span style="font-weight: 600;">${h.name}</span>
-                <button onclick="db.collection('houses').doc('${h.id}').delete()" style="color:red; border:none; background:none; cursor:pointer; font-weight:bold;">Remove</button>
+        list.innerHTML = "<h4>My Listings</h4>";
+        houses.filter(h => h.ownerId === auth.currentUser.uid).forEach(h => {
+            list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;">
+                <span>${h.name}</span>
+                <button onclick="db.collection('houses').doc('${h.id}').delete()" style="color:red; border:none; background:none; cursor:pointer;">Delete</button>
             </div>`;
         });
     }
