@@ -3,125 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Keja Yangu | Murang'a Student Housing</title>
+    <title>Keja Yangu | Student Housing</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <style>
-        :root { --navy: #1a237e; --red: #d32f2f; --bg: #f4f7f9; --success: #25d366; --blue-tick: #2196F3; --gray: #7f8c8d; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
-        .container { max-width: 500px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
+        :root { --navy: #1a237e; --red: #d32f2f; --bg: #f4f7f9; --success: #25d366; --blue-tick: #2196F3; --gold: #ffc107; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; padding-bottom: 80px; }
+        .container { max-width: 500px; margin: 0 auto; }
         
-        /* Brand Styling */
-        .header-brand { text-align: center; padding: 15px 0; }
-        .logo-img { width: 90px; height: auto; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .brand-name { color: var(--navy); margin-top: 8px; font-weight: 800; font-size: 1.6rem; letter-spacing: 1px; }
-        .admin-badge { background: #ffd700; color: #000; font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; font-weight: bold; display: none; margin: 5px auto; width: fit-content; }
+        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: none; margin-bottom: 20px; }
+        input, select, .btn { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; }
+        .btn-primary { background: var(--navy); color: white; border: none; font-weight: bold; cursor: pointer; }
+        
+        /* Scam Warning */
+        .scam-banner { background: #fff3cd; color: #856404; padding: 10px; border-radius: 10px; font-size: 0.8rem; border: 1px solid #ffeeba; margin-bottom: 15px; text-align: center; }
 
-        /* Card System */
-        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); display: none; margin-bottom: 20px; border: 1px solid #eee; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        input, select, .btn { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; font-size: 1rem; }
-        .btn-primary { background: var(--navy); color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-primary:active { transform: scale(0.98); }
-        
-        /* Marketplace */
-        .filter-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .house-card { background: white; border-radius: 18px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .house-img { width: 100%; height: 200px; object-fit: cover; background: #eee; }
+        /* House Card */
+        .house-card { background: white; border-radius: 18px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); position: relative; }
+        .house-img { width: 100%; height: 210px; object-fit: cover; }
         .house-info { padding: 15px; }
         .price { color: var(--red); font-size: 1.3rem; font-weight: 800; }
-        .verified-tick { color: var(--blue-tick); font-size: 1.1rem; margin-left: 4px; }
         
-        .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .btn-wa { background: var(--success); color: white; text-decoration: none; text-align: center; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 0.9rem; }
-        .btn-map { background: var(--navy); color: white; text-decoration: none; text-align: center; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 0.9rem; }
-        .btn-report { background: #fff1f1; color: var(--red); border: none; font-size: 0.75rem; margin-top: 10px; cursor: pointer; border-radius: 5px; padding: 5px; }
+        /* Interaction Icons */
+        .card-actions { display: flex; gap: 15px; margin: 10px 0; font-size: 1.2rem; }
+        .heart-icon { color: var(--red); cursor: pointer; }
+        .verified-tick { color: var(--blue-tick); margin-left: 5px; }
 
-        /* Admin Dashboard */
-        .admin-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; font-size: 0.85rem; }
-        .report-item { background: #fff5f5; border-left: 4px solid var(--red); padding: 10px; margin-top: 10px; border-radius: 5px; }
+        /* Reviews */
+        .review-section { background: #f9f9f9; padding: 10px; border-radius: 10px; margin-top: 10px; font-size: 0.85rem; }
+        .review-item { border-bottom: 1px solid #eee; padding: 5px 0; }
 
-        /* Footer & Contact */
-        footer { margin-top: auto; padding: 20px; text-align: center; font-size: 0.85rem; color: #7f8c8d; }
-        .contact-box { background: #e8eaf6; padding: 15px; border-radius: 15px; margin-top: 10px; text-align: left; font-size: 0.9rem; }
+        /* Admin Controls */
+        .admin-box { background: #fff; border: 2px solid gold; padding: 15px; border-radius: 15px; margin-top: 20px; }
+        .admin-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; padding: 8px 0; border-bottom: 1px solid #eee; }
+        
+        /* Tabs for Student */
+        .tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tab-btn { flex: 1; padding: 10px; border-radius: 10px; border: none; background: #ddd; cursor: pointer; }
+        .tab-active { background: var(--navy); color: white; }
+
+        footer { text-align: center; padding: 20px; font-size: 0.8rem; color: #777; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header-brand">
-        <img src="https://i.ibb.co/3mKNG8nV/House-logo.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/25/25694.png'" class="logo-img">
-        <div class="brand-name">KEJA YANGU</div>
-        <div id="admin-tag" class="admin-badge">ADMINISTRATOR</div>
+    <div style="text-align:center; padding: 10px;">
+        <img src="https://i.ibb.co/3mKNG8nV/House-logo.png" style="width:70px; border-radius:10px;">
+        <h2 style="color:var(--navy); margin:5px 0;">KEJA YANGU</h2>
     </div>
 
     <div id="auth-screen" class="card" style="display: block;">
-        <h3 style="margin-top:0;">Sign In</h3>
-        <input type="email" id="email" placeholder="Email Address">
+        <div class="scam-banner">⚠️ <strong>SECURITY ALERT:</strong> Never pay any deposit or booking fee before visiting the house. Payments are NOT done on this platform.</div>
+        <input type="email" id="email" placeholder="Email">
         <input type="password" id="pass" placeholder="Password">
         <select id="role">
-            <option value="student">I am a Student</option>
-            <option value="landlord">I am a Landlord</option>
+            <option value="student">Student</option>
+            <option value="landlord">Landlord</option>
         </select>
-        <button onclick="authAction('login')" class="btn btn-primary">Login</button>
-        <button onclick="authAction('signup')" class="btn" style="background:none; color:var(--navy); border:1px solid var(--navy);">Create Account</button>
-        <p onclick="forgotPassword()" style="text-align:center; font-size:0.8rem; color:var(--gray); cursor:pointer; margin-top:10px;">Forgot Password?</p>
-    </div>
-
-    <div id="admin-screen" class="card">
-        <h3 style="color:var(--navy)">Admin Control Panel</h3>
-        <div id="admin-user-list"></div>
-        <hr>
-        <h4>Pending Reports</h4>
-        <div id="admin-reports"></div>
-        <button onclick="auth.signOut()" class="btn" style="color:var(--red); border:none; background:none; font-weight:bold;">Logout</button>
+        <button onclick="authAction('login')" class="btn btn-primary">Sign In</button>
+        <button onclick="authAction('signup')" class="btn" style="background:none; border:1px solid var(--navy);">Register</button>
     </div>
 
     <div id="student-screen" class="card">
-        <div class="filter-row">
-            <input type="text" id="search" placeholder="🔍 Search..." onkeyup="drawMarket()" style="margin:0;">
-            <select id="price-filter" onchange="drawMarket()" style="margin:0;">
-                <option value="all">Any Price</option>
-                <option value="0-3000">Under 3k</option>
-                <option value="3000-5000">3k - 5k</option>
-                <option value="5000+">5k+</option>
-            </select>
+        <div class="tabs">
+            <button id="tab-all" class="tab-btn tab-active" onclick="switchTab('all')">All Houses</button>
+            <button id="tab-liked" class="tab-btn" onclick="switchTab('liked')">My Likes ❤️</button>
         </div>
+        
+        <div class="scam-banner">🚫 NO online payments. Visit the house first!</div>
+        <input type="text" id="search" placeholder="🔍 Search houses..." onkeyup="drawMarket()">
+        
         <div id="market-list"></div>
-        <hr>
-        <div class="contact-box">
-            <strong>📞 Contact Support:</strong><br>
-            Issues? Call/WhatsApp: 0720 680 769<br>
-            Email: jonahnjugi100@gmail.com
-        </div>
-        <button onclick="auth.signOut()" class="btn" style="color:var(--red); border:none; background:none; font-weight:bold; margin-top:15px;">Logout</button>
-    </div>
 
-    <div id="landlord-screen" class="card">
-        <h3>Post New Property</h3>
-        <input type="text" id="h-name" placeholder="House/Hostel Name">
-        <input type="number" id="h-price" placeholder="Monthly Rent (Ksh)">
-        <input type="text" id="h-phone" placeholder="WhatsApp Number (e.g. 254...)">
-        <input type="text" id="h-dist" placeholder="Distance from Gate">
-        <input type="text" id="h-img" placeholder="Photo URL (ImgBB Direct Link)">
-        <input type="text" id="h-map" placeholder="Google Maps Link (Optional)">
-        <button onclick="saveHouse()" class="btn btn-primary">Publish Listing</button>
-        <hr>
-        <div id="landlord-list"></div>
+        <div id="admin-panel" style="display:none;" class="admin-box">
+            <h4 style="margin-top:0;">🛡️ Admin Control Room</h4>
+            <div id="admin-user-list"></div>
+            <hr>
+            <div id="admin-reports"></div>
+        </div>
+
         <button onclick="auth.signOut()" class="btn" style="color:var(--red); border:none; background:none; font-weight:bold;">Logout</button>
     </div>
 
-    <footer>
-        <p>&copy; 2025 Keja Yangu | Built by Jonah Njugi</p>
-    </footer>
+    <div id="landlord-screen" class="card">
+        <h3>Post House</h3>
+        <input type="text" id="h-name" placeholder="House Name">
+        <input type="number" id="h-price" placeholder="Price">
+        <input type="text" id="h-phone" placeholder="WhatsApp Number">
+        <input type="text" id="h-dist" placeholder="Distance (e.g. 500m)">
+        <input type="text" id="h-img" placeholder="Image URL">
+        <button onclick="saveHouse()" class="btn btn-primary">Publish</button>
+        <hr>
+        <div id="landlord-list"></div>
+        <button onclick="auth.signOut()" class="btn" style="color:var(--red); border:none; background:none;">Logout</button>
+    </div>
+
+    <footer>&copy; 2025 Keja Yangu Murang'a</footer>
 </div>
 
 <script>
-    // --- CONFIGURATION ---
     const ADMIN_EMAIL = "jonahnjugi100@gmail.com";
     const firebaseConfig = {
         apiKey: "AIzaSyCC8SA7FKzikzHwvA9A6dyrv0x2jguyPPQ",
@@ -137,151 +121,160 @@
 
     let houses = [];
     let usersMap = {};
+    let myLikes = [];
+    let currentTab = 'all';
 
-    // --- AUTH LOGIC ---
     auth.onAuthStateChanged(async user => {
         document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
-        document.getElementById('admin-tag').style.display = 'none';
-
         if(!user) {
             document.getElementById('auth-screen').style.display = 'block';
         } else {
-            if(user.email === ADMIN_EMAIL) {
-                document.getElementById('admin-screen').style.display = 'block';
-                document.getElementById('admin-tag').style.display = 'block';
-                loadAdminData();
-            } else {
-                const doc = await db.collection('users').doc(user.uid).get();
-                const role = doc.exists ? doc.data().role : 'student';
-                document.getElementById(role + '-screen').style.display = 'block';
-            }
+            // Everyone uses the Student screen to view, including Admin
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            const role = userDoc.exists ? userDoc.data().role : 'student';
             
-            db.collection('users').onSnapshot(snap => {
-                snap.forEach(doc => usersMap[doc.id] = doc.data());
-                loadHouses();
-            });
+            if(user.email === ADMIN_EMAIL || role === 'student') {
+                document.getElementById('student-screen').style.display = 'block';
+                if(user.email === ADMIN_EMAIL) {
+                    document.getElementById('admin-panel').style.display = 'block';
+                    loadAdminData();
+                }
+            } else {
+                document.getElementById('landlord-screen').style.display = 'block';
+            }
+            loadBaseData();
         }
     });
 
-    // --- DATA LOADING ---
-    function loadHouses() {
-        db.collection('houses').orderBy('createdAt', 'desc').onSnapshot(snap => {
-            houses = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    function loadBaseData() {
+        db.collection('users').onSnapshot(snap => {
+            snap.forEach(doc => usersMap[doc.id] = doc.data());
+            db.collection('houses').orderBy('createdAt', 'desc').onSnapshot(hSnap => {
+                houses = hSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                drawMarket();
+                if(document.getElementById('landlord-list')) drawLandlordList();
+            });
+        });
+        db.collection('likes').doc(auth.currentUser.uid).onSnapshot(doc => {
+            myLikes = doc.exists ? doc.data().houseIds : [];
             drawMarket();
-            if(document.getElementById('landlord-list')) drawLandlordList();
         });
     }
 
     function drawMarket() {
-        const container = document.getElementById('market-list');
+        const list = document.getElementById('market-list');
         const query = document.getElementById('search').value.toLowerCase();
-        const priceFilter = document.getElementById('price-filter').value;
-        if(!container) return;
-        container.innerHTML = "";
+        list.innerHTML = "";
 
-        const filtered = houses.filter(h => {
-            const price = parseInt(h.price);
+        houses.filter(h => {
             const matchesSearch = h.name.toLowerCase().includes(query);
-            let matchesPrice = (priceFilter === "all") || 
-                (priceFilter === "0-3000" && price < 3000) ||
-                (priceFilter === "3000-5000" && price >= 3000 && price <= 5000) ||
-                (priceFilter === "5000+" && price > 5000);
-            return matchesSearch && matchesPrice;
-        });
-
-        filtered.forEach(h => {
+            const matchesTab = (currentTab === 'all') || (currentTab === 'liked' && myLikes.includes(h.id));
+            return matchesSearch && matchesTab;
+        }).forEach(h => {
             const isV = usersMap[h.ownerId]?.isVerified;
-            container.innerHTML += `
+            const isLiked = myLikes.includes(h.id);
+            const isAdmin = auth.currentUser.email === ADMIN_EMAIL;
+
+            list.innerHTML += `
                 <div class="house-card">
-                    <img src="${h.img || 'https://via.placeholder.com/400x200'}" class="house-img">
+                    <img src="${h.img || ''}" class="house-img">
                     <div class="house-info">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <strong>${h.name} ${isV ? '<span class="verified-tick">✔</span>' : ''}</strong>
+                        <div style="display:flex; justify-content:space-between;">
                             <span class="price">Ksh ${h.price}</span>
+                            <span>${h.name} ${isV ? '<b class="verified-tick">✔</b>' : ''}</span>
                         </div>
-                        <div style="font-size:0.8rem; color:#666; margin:5px 0;">📍 ${h.dist}</div>
-                        <div class="action-row">
-                            <a href="https://wa.me/${h.phone}?text=Interested in ${h.name}" class="btn-wa" target="_blank">WhatsApp</a>
-                            <a href="${h.map || 'javascript:alert(\'No map provided\')'}" class="btn-map" target="${h.map?'_blank':''}">View Map</a>
+                        <div class="card-actions">
+                            <span onclick="toggleLike('${h.id}')" class="heart-icon">${isLiked ? '❤️' : '🤍'}</span>
+                            <a href="https://wa.me/${h.phone}" style="text-decoration:none;">💬</a>
+                            ${isAdmin ? `<button onclick="deleteListing('${h.id}')" style="background:none; border:none; color:red; cursor:pointer;">🗑️ Delete</button>` : ''}
                         </div>
-                        <button class="btn-report" onclick="reportHouse('${h.id}', '${h.name}')">🚩 Report Fake Listing</button>
+                        <div style="font-size:0.8rem; color:#666;">📍 ${h.dist}</div>
+                        
+                        <div class="review-section">
+                            <input type="text" id="rev-${h.id}" placeholder="Write a review..." style="padding:5px; font-size:0.7rem; width:70%;">
+                            <button onclick="addReview('${h.id}')" style="width:25%; font-size:0.7rem; padding:5px;">Post</button>
+                            <div id="reviews-${h.id}">Loading reviews...</div>
+                        </div>
                     </div>
                 </div>`;
+            loadReviews(h.id);
         });
     }
 
-    // --- LANDLORD ACTIONS ---
-    async function saveHouse() {
-        const name = document.getElementById('h-name').value;
-        const price = document.getElementById('h-price').value;
-        const phone = document.getElementById('h-phone').value.replace(/\D/g,'');
-        if(!name || !price || !phone) return alert("Fill Name, Price and WhatsApp");
-        
-        await db.collection('houses').add({
-            name, price, phone, 
-            dist: document.getElementById('h-dist').value,
-            img: document.getElementById('h-img').value,
-            map: document.getElementById('h-map').value,
-            ownerId: auth.currentUser.uid,
+    // INTERACTION LOGIC
+    async function toggleLike(hid) {
+        let newLikes = [...myLikes];
+        if(newLikes.includes(hid)) newLikes = newLikes.filter(id => id !== hid);
+        else newLikes.push(hid);
+        await db.collection('likes').doc(auth.currentUser.uid).set({ houseIds: newLikes });
+    }
+
+    async function addReview(hid) {
+        const txt = document.getElementById('rev-'+hid).value;
+        if(!txt) return;
+        await db.collection('houses').doc(hid).collection('reviews').add({
+            text: txt,
+            user: auth.currentUser.email,
             createdAt: new Date()
         });
-        alert("Published Successfully!");
+        document.getElementById('rev-'+hid).value = "";
     }
 
-    // --- ADMIN ACTIONS ---
+    function loadReviews(hid) {
+        db.collection('houses').doc(hid).collection('reviews').orderBy('createdAt','desc').limit(3).onSnapshot(snap => {
+            const div = document.getElementById('reviews-'+hid);
+            div.innerHTML = "";
+            snap.forEach(doc => {
+                div.innerHTML += `<div class="review-item"><b>${doc.data().user.split('@')[0]}:</b> ${doc.data().text}</div>`;
+            });
+        });
+    }
+
+    // ADMIN DASHBOARD LOGIC
     function loadAdminData() {
-        // Users list
         db.collection('users').where('role', '==', 'landlord').onSnapshot(snap => {
             const list = document.getElementById('admin-user-list');
-            list.innerHTML = "<h4>Landlords</h4>";
+            list.innerHTML = "<h5>Verify Landlords</h5>";
             snap.forEach(doc => {
                 const u = doc.data();
                 list.innerHTML += `<div class="admin-row">
                     <span>${u.email}</span>
-                    <button onclick="toggleVerify('${doc.id}', ${!u.isVerified})">${u.isVerified ? '✅ Verified' : '❌ Verify'}</button>
-                </div>`;
-            });
-        });
-        // Reports list
-        db.collection('reports').where('status', '==', 'pending').onSnapshot(snap => {
-            const list = document.getElementById('admin-reports');
-            list.innerHTML = "";
-            snap.forEach(doc => {
-                const r = doc.data();
-                list.innerHTML += `<div class="report-item">
-                    <b>${r.houseName}</b> reported by ${r.reportedBy}<br>
-                    <button onclick="deleteHouseAndResolve('${r.houseId}', '${doc.id}')" style="background:red; color:white; border:none; border-radius:5px; margin-top:5px;">DELETE LISTING</button>
+                    <button onclick="updateVerify('${doc.id}', ${!u.isVerified})">${u.isVerified ? '✅ Verified' : '❌ Unverified'}</button>
                 </div>`;
             });
         });
     }
 
-    function toggleVerify(uid, status) { db.collection('users').doc(uid).update({ isVerified: status }); }
-    
-    async function reportHouse(hid, hname) {
-        if(confirm("Report this house to Admin?")) {
-            await db.collection('reports').add({ houseId: hid, houseName: hname, reportedBy: auth.currentUser.email, status: 'pending', createdAt: new Date() });
-            alert("Reported.");
-        }
+    function updateVerify(uid, status) { db.collection('users').doc(uid).update({ isVerified: status }); }
+    function deleteListing(hid) { if(confirm("Delete this fake listing?")) db.collection('houses').doc(hid).delete(); }
+
+    // TAB LOGIC
+    function switchTab(t) {
+        currentTab = t;
+        document.getElementById('tab-all').className = t === 'all' ? 'tab-btn tab-active' : 'tab-btn';
+        document.getElementById('tab-liked').className = t === 'liked' ? 'tab-btn tab-active' : 'tab-btn';
+        drawMarket();
     }
 
-    async function deleteHouseAndResolve(hid, rid) {
-        if(confirm("Delete this house permanently?")) {
-            await db.collection('houses').doc(hid).delete();
-            await db.collection('reports').doc(rid).update({ status: 'resolved' });
-        }
+    // BASE FUNCTIONS
+    async function saveHouse() {
+        const h = {
+            name: document.getElementById('h-name').value,
+            price: document.getElementById('h-price').value,
+            phone: document.getElementById('h-phone').value.replace(/\D/g,''),
+            dist: document.getElementById('h-dist').value,
+            img: document.getElementById('h-img').value,
+            ownerId: auth.currentUser.uid,
+            createdAt: new Date()
+        };
+        await db.collection('houses').add(h);
+        alert("Posted!");
     }
 
-    // --- AUTH UTILS ---
     function authAction(type) {
         const e = document.getElementById('email').value, p = document.getElementById('pass').value, r = document.getElementById('role').value;
         if(type === 'login') auth.signInWithEmailAndPassword(e, p).catch(err => alert(err.message));
         else auth.createUserWithEmailAndPassword(e, p).then(res => db.collection('users').doc(res.user.uid).set({ email: e, role: r, isVerified: false }));
-    }
-    function forgotPassword() {
-        const e = document.getElementById('email').value;
-        if(e) auth.sendPasswordResetEmail(e).then(() => alert("Reset email sent!"));
-        else alert("Enter email first.");
     }
 </script>
 </body>
