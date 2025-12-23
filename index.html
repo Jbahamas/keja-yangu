@@ -3,209 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Keja Yangu | Review & Rating Edition</title>
+    <title>Keja Yangu | Murang'a Student Housing</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <style>
-        :root { --primary: #039be5; --dark: #263238; --bg: #f4f7f9; --success: #4caf50; --whatsapp: #25d366; --danger: #ff5252; --warning: #ffb300; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 550px; text-align: center; display: none; }
+        :root { --navy: #1a237e; --red: #d32f2f; --bg: #f4f7f9; --success: #25d366; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
+        .container { max-width: 500px; margin: 0 auto; }
         
-        input, select, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-success { background: var(--success); color: white; width: auto; padding: 6px 12px; border-radius: 4px; font-size: 0.8rem; }
-        .btn-whatsapp { background: var(--whatsapp); color: white; padding: 6px 12px; border-radius: 4px; font-size: 0.8rem; text-decoration: none; display: inline-block; }
-        .btn-danger { background: var(--danger); color: white; margin-top: 20px; }
-        .btn-small-danger { background: #ffebee; color: #c62828; padding: 5px 10px; border-radius: 4px; font-size: 0.75rem; border: 1px solid #ef9a9a; }
-
-        .data-container { text-align: left; background: #f9f9f9; padding: 15px; border-radius: 8px; margin-top: 20px; max-height: 400px; overflow-y: auto; }
-        .house-card { background: white; padding: 15px; border-radius: 8px; margin-bottom: 12px; border-left: 6px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .amenity-tag { font-size: 0.65rem; background: #e1f5fe; color: #01579b; padding: 2px 6px; border-radius: 4px; margin-right: 4px; display: inline-block; }
-        .rating-star { color: var(--warning); font-weight: bold; }
-        .review-box { font-size: 0.8rem; background: #fff; padding: 8px; border-radius: 5px; margin-top: 5px; border: 1px solid #eee; }
-        .status-badge { font-size: 0.7rem; padding: 3px 8px; border-radius: 10px; font-weight: bold; text-transform: uppercase; }
-        .pending { background: #fff3e0; color: #ef6c00; }
-        .approved { background: #e8f5e9; color: #2e7d32; }
+        /* Header & Logo Section */
+        .header-brand { text-align: center; padding: 20px 0; }
+        .logo-img { width: 120px; height: auto; border-radius: 15px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15)); }
+        .brand-name { color: var(--navy); margin-top: 12px; font-weight: 800; font-size: 1.7rem; letter-spacing: 1px; }
+        
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); display: none; margin-bottom: 20px; border: 1px solid #eee; }
+        input, select, .btn { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; font-size: 1rem; }
+        .btn-primary { background: var(--navy); color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        
+        /* Marketplace Layout */
+        .house-card { background: white; border-radius: 18px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; transition: 0.3s; }
+        .house-img { width: 100%; height: 230px; object-fit: cover; background: #eee; border-bottom: 1px solid #eee; }
+        .house-info { padding: 18px; text-align: left; }
+        .price { color: var(--red); font-size: 1.5rem; font-weight: 800; }
+        
+        .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
+        .btn-wa { background: var(--success); color: white; text-decoration: none; text-align: center; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 1rem; }
+        .btn-map { background: var(--navy); color: white; text-decoration: none; text-align: center; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 1rem; }
     </style>
 </head>
 <body>
 
+<div class="container">
+    <div class="header-brand">
+        <img src="https://i.ibb.co/3mKNG8nV/House-logo.png" 
+             onerror="this.src='https://cdn-icons-png.flaticon.com/512/25/25694.png'" 
+             alt="Keja Yangu Logo" 
+             class="logo-img">
+        <div class="brand-name">KEJA YANGU</div>
+        <p style="margin:0; font-size:0.9rem; color:#666; font-weight: 500;">Murang'a University Student Housing</p>
+    </div>
+
     <div id="auth-screen" class="card" style="display: block;">
-        <h1>Keja Yangu</h1>
-        <input type="email" id="email" placeholder="Email">
-        <input type="password" id="password" placeholder="Password">
+        <h3 style="margin-top:0; color: var(--navy);">Get Started</h3>
+        <input type="email" id="email" placeholder="Email Address">
+        <input type="password" id="pass" placeholder="Password">
         <select id="role">
             <option value="student">I am a Student</option>
             <option value="landlord">I am a Landlord</option>
         </select>
-        <button onclick="handleLogin()" class="btn btn-primary">Sign In</button>
-        <button onclick="handleSignUp()" class="btn">Register</button>
+        <button onclick="authAction('login')" class="btn btn-primary">Sign In</button>
+        <button onclick="authAction('signup')" class="btn" style="background:none; color:var(--navy); border:2px solid var(--navy);">Create Account</button>
     </div>
 
     <div id="student-screen" class="card">
-        <h2>Student Dashboard</h2>
-        <input type="text" id="search-input" placeholder="🔍 Search houses..." onkeyup="filterHouses()">
-        
-        <div class="data-container" style="background: #e1f5fe;">
-            <h4 style="margin:0">My Bookings & Reviews</h4>
-            <div id="student-bookings">No requests.</div>
-        </div>
-        
-        <div class="data-container">
-            <h4>Available Properties</h4>
-            <div id="student-house-list">Loading...</div>
-        </div>
-        <button onclick="logout()" class="btn btn-danger">Logout</button>
+        <h3 style="margin-top:0;">Find Your Keja</h3>
+        <input type="text" id="search" placeholder="🔍 Search name or area..." onkeyup="drawMarket()">
+        <div id="market-list"></div>
+        <button onclick="auth.signOut()" class="btn" style="color:var(--red); border:none; background:none; font-weight: bold;">Logout</button>
     </div>
 
     <div id="landlord-screen" class="card">
-        <h2>Landlord Portal</h2>
-        <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; text-align: left;">
-            <h4 style="margin:0 0 10px 0">New Listing</h4>
+        <h3 style="margin-top:0;">Landlord Dashboard</h3>
+        <div style="background:#f8f9fa; padding:15px; border-radius:15px; border:1px solid #eef;">
+            <h4 style="margin-top:0;">Post New Listing</h4>
             <input type="text" id="h-name" placeholder="House Name">
-            <input type="number" id="h-price" placeholder="Rent (Ksh)">
-            <input type="text" id="h-phone" placeholder="WhatsApp (254...)">
-            <div style="font-size: 0.8rem;"><input type="checkbox" id="wifi"> Wi-Fi | <input type="checkbox" id="water"> Water | <input type="checkbox" id="security"> Security</div>
-            <button onclick="addNewHouse()" class="btn btn-primary">Post Property</button>
+            <input type="number" id="h-price" placeholder="Monthly Rent (Ksh)">
+            <input type="text" id="h-dist" placeholder="Distance (e.g. 500m from gate)">
+            <input type="text" id="h-img" placeholder="Paste House Photo URL">
+            <input type="text" id="h-map" placeholder="Google Maps Link">
+            <input type="text" id="h-amen" placeholder="Amenities (WiFi, Water, CCTV)">
+            <button onclick="saveHouse()" class="btn btn-primary">Publish Property</button>
         </div>
-        <div class="data-container" style="background: #e8f5e9;">
-            <h4>Manage Requests</h4>
-            <div id="landlord-bookings">No requests.</div>
-        </div>
-        <div class="data-container">
-            <h4>Your Listings</h4>
-            <div id="landlord-house-list">Loading...</div>
-        </div>
-        <button onclick="logout()" class="btn btn-danger">Logout</button>
+        <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
+        <div id="landlord-list"></div>
+        <button onclick="auth.signOut()" class="btn" style="color:var(--red); border:none; background:none; margin-top:20px;">Logout</button>
     </div>
+</div>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCC8SA7FKzikzHwvA9A6dyrv0x2jguyPPQ",
-            authDomain: "murang-a-student-housing.firebaseapp.com",
-            projectId: "murang-a-student-housing",
-            storageBucket: "murang-a-student-housing.appspot.com",
-            messagingSenderId: "340466154926",
-            appId: "1:340466154926:web:ea439a7f40ea64a13d5c3f"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        let allHouses = [];
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyCC8SA7FKzikzHwvA9A6dyrv0x2jguyPPQ",
+        authDomain: "murang-a-student-housing.firebaseapp.com",
+        projectId: "murang-a-student-housing",
+        storageBucket: "murang-a-student-housing.appspot.com",
+        messagingSenderId: "340466154926",
+        appId: "1:340466154926:web:ea439a7f40ea64a13d5c3f"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-        auth.onAuthStateChanged(async (user) => {
-            document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
-            if (user) {
-                const doc = await db.collection('users').doc(user.uid).get();
-                if (doc.exists && doc.data().role === 'landlord') {
-                    document.getElementById('landlord-screen').style.display = 'block';
-                    loadLandlordBookings(); loadHouses(true);
-                } else {
-                    document.getElementById('student-screen').style.display = 'block';
-                    loadHouses(false); loadStudentBookings(user.email);
-                }
-            } else { document.getElementById('auth-screen').style.display = 'block'; }
+    let houses = [];
+    let currentRole = '';
+
+    auth.onAuthStateChanged(async user => {
+        document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
+        if(!user) {
+            document.getElementById('auth-screen').style.display = 'block';
+        } else {
+            const doc = await db.collection('users').doc(user.uid).get();
+            currentRole = doc.exists ? doc.data().role : 'student';
+            document.getElementById(currentRole + '-screen').style.display = 'block';
+            loadData();
+        }
+    });
+
+    function loadData() {
+        db.collection('houses').orderBy('createdAt', 'desc').onSnapshot(snap => {
+            houses = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            drawMarket();
+            if(currentRole === 'landlord') drawLandlordList();
         });
+    }
 
-        async function addNewHouse() {
-            const h = { houseName: document.getElementById('h-name').value, price: document.getElementById('h-price').value, phone: document.getElementById('h-phone').value, amenities: [] };
-            if(document.getElementById('wifi').checked) h.amenities.push("Wi-Fi");
-            if(document.getElementById('water').checked) h.amenities.push("Water");
-            if(document.getElementById('security').checked) h.amenities.push("Security");
-            await db.collection('houses').add(h); location.reload();
+    function drawMarket() {
+        const query = document.getElementById('search').value.toLowerCase();
+        const container = document.getElementById('market-list');
+        if(!container) return;
+        container.innerHTML = "";
+
+        const filtered = houses.filter(h => h.name.toLowerCase().includes(query));
+        if(filtered.length === 0) {
+            container.innerHTML = "<p style='color:#999; padding:20px;'>No properties found.</p>";
+            return;
         }
 
-        async function loadHouses(isAdmin) {
-            const snap = await db.collection('houses').get();
-            allHouses = [];
-            for (let doc of snap.docs) {
-                let data = doc.data(); data.id = doc.id;
-                const revSnap = await db.collection('reviews').where('houseId', '==', doc.id).get();
-                data.reviews = revSnap.docs.map(d => d.data());
-                allHouses.push(data);
-            }
-            renderHouses(allHouses, isAdmin);
-        }
-
-        function renderHouses(houses, isAdmin) {
-            let html = "";
-            houses.forEach(h => {
-                const amens = h.amenities ? h.amenities.map(a => `<span class="amenity-tag">${a}</span>`).join('') : '';
-                const revs = h.reviews ? h.reviews.map(r => `<div class="review-box"><span class="rating-star">★ ${r.stars}</span>: ${r.comment}</div>`).join('') : '';
-                html += `<div class="house-card">
-                    <div style="text-align:left">
-                        <strong>${h.houseName}</strong> - Ksh ${h.price}<br>
-                        ${amens}<br>${revs}
-                    </div>
-                    <div style="margin-top:10px">
-                        ${isAdmin ? `<button class="btn-small-danger" onclick="deleteHouse('${h.id}')">Delete</button>` : 
-                        `<button class="btn-success" onclick="bookHouse('${h.id}', '${h.houseName}')">Book</button>
-                         <a href="https://wa.me/${h.phone}" target="_blank" class="btn-whatsapp">Chat</a>`}
+        filtered.forEach(h => {
+            container.innerHTML += `
+                <div class="house-card">
+                    <img src="${h.img || 'https://via.placeholder.com/400x230?text=No+Photo'}" class="house-img">
+                    <div class="house-info">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <strong style="font-size:1.2rem; color:var(--navy);">${h.name}</strong>
+                            <span class="price">Ksh ${h.price}</span>
+                        </div>
+                        <div style="color:#666; margin:8px 0; font-size:0.9rem;">📍 ${h.dist || 'Walking distance'}</div>
+                        <div class="action-row">
+                            <a href="https://wa.me/254720680769?text=Hello, I am interested in ${h.name}" class="btn-wa">WhatsApp</a>
+                            <a href="${h.map || '#'}" target="_blank" class="btn-map">Google Maps</a>
+                        </div>
                     </div>
                 </div>`;
-            });
-            document.getElementById(isAdmin ? 'landlord-house-list' : 'student-house-list').innerHTML = html || "Empty.";
-        }
+        });
+    }
 
-        async function bookHouse(id, name) {
-            await db.collection('bookings').add({ studentEmail: auth.currentUser.email, houseId: id, houseName: name, status: 'pending', timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-            alert("Request Sent!");
-        }
+    async function saveHouse() {
+        const name = document.getElementById('h-name').value;
+        const price = document.getElementById('h-price').value;
+        const dist = document.getElementById('h-dist').value;
+        const img = document.getElementById('h-img').value;
+        const map = document.getElementById('h-map').value;
+        const amenities = document.getElementById('h-amen').value;
+        if(!name || !price) return alert("Please enter both the name and price.");
+        
+        await db.collection('houses').add({
+            name, price, dist, img, map, amenities,
+            ownerId: auth.currentUser.uid,
+            createdAt: new Date()
+        });
+        alert("Listing published successfully!");
+        document.getElementById('h-name').value = "";
+    }
 
-        function loadStudentBookings(email) {
-            db.collection('bookings').where('studentEmail', '==', email).onSnapshot(snap => {
-                let html = "";
-                snap.forEach(doc => {
-                    const b = doc.data();
-                    html += `<div class="house-card">
-                        <span>${b.houseName} <span class="status-badge ${b.status}">${b.status}</span></span>
-                        ${b.status === 'approved' ? `
-                            <div style="margin-top:10px; border-top:1px solid #eee; padding-top:5px;">
-                                <select id="star-${doc.id}"><option value="5">5 Stars</option><option value="4">4 Stars</option><option value="1">1 Star</option></select>
-                                <textarea id="comm-${doc.id}" placeholder="Your review..."></textarea>
-                                <button class="btn-primary" onclick="submitReview('${b.houseId}', '${doc.id}')" style="padding:5px; font-size:0.7rem;">Submit Review</button>
-                            </div>` : ''}
-                    </div>`;
-                });
-                document.getElementById('student-bookings').innerHTML = html || "No bookings.";
-            });
-        }
+    function drawLandlordList() {
+        const list = document.getElementById('landlord-list');
+        list.innerHTML = "<h4>Your Properties</h4>";
+        const myHouses = houses.filter(h => h.ownerId === auth.currentUser.uid);
+        myHouses.forEach(h => {
+            list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:12px; border-bottom:1px solid #eee; background:#fff;">
+                <span style="font-weight: 600;">${h.name}</span>
+                <button onclick="db.collection('houses').doc('${h.id}').delete()" style="color:red; border:none; background:none; cursor:pointer; font-weight:bold;">Remove</button>
+            </div>`;
+        });
+    }
 
-        async function submitReview(houseId, bookingId) {
-            const stars = document.getElementById(`star-${bookingId}`).value;
-            const comment = document.getElementById(`comm-${bookingId}`).value;
-            await db.collection('reviews').add({ houseId, stars, comment });
-            alert("Thanks for your review!");
-            loadHouses(false);
-        }
-
-        function loadLandlordBookings() {
-            db.collection('bookings').onSnapshot(snap => {
-                let html = "";
-                snap.forEach(doc => {
-                    const b = doc.data();
-                    html += `<div class="booking-card">
-                        <span><strong>${b.studentEmail}</strong><br>${b.houseName}</span>
-                        ${b.status === 'pending' ? `<button class="btn-success" onclick="approve('${doc.id}')">Approve</button>` : `<span class="status-badge approved">Approved</span>`}
-                    </div>`;
-                });
-                document.getElementById('landlord-bookings').innerHTML = html || "No requests.";
-            });
-        }
-
-        async function approve(id) { await db.collection('bookings').doc(id).update({ status: 'approved' }); }
-        async function deleteHouse(id) { if(confirm("Delete?")) { await db.collection('houses').doc(id).delete(); loadHouses(true); } }
-        function filterHouses() { const term = document.getElementById('search-input').value.toLowerCase(); renderHouses(allHouses.filter(h => h.houseName.toLowerCase().includes(term)), false); }
-        function handleLogin() { auth.signInWithEmailAndPassword(document.getElementById('email').value, document.getElementById('password').value).catch(e => alert(e.message)); }
-        async function handleSignUp() {
-            const res = await auth.createUserWithEmailAndPassword(document.getElementById('email').value, document.getElementById('password').value).catch(e => alert(e.message));
-            if(res) await db.collection('users').doc(res.user.uid).set({ email: document.getElementById('email').value, role: document.getElementById('role').value });
-        }
-        function logout() { auth.signOut(); }
-    </script>
+    function authAction(type) {
+        const e = document.getElementById('email').value, p = document.getElementById('pass').value, r = document.getElementById('role').value;
+        if(type === 'login') auth.signInWithEmailAndPassword(e, p).catch(err => alert(err.message));
+        else auth.createUserWithEmailAndPassword(e, p).then(res => db.collection('users').doc(res.user.uid).set({ role: r }));
+    }
+</script>
 </body>
 </html>
