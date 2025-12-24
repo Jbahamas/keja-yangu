@@ -4,17 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>Keja Yangu | Official Student Housing Murang'a</title>
-    <meta name="description" content="Find the best student hostels and houses near Murang'a University. Verified landlords, real prices, and direct contact. No brokers, no scams.">
-    <meta name="keywords" content="Keja Yangu, Keja Yangu Murang'a, MUT Hostels, Murang'a University Housing, Student Rooms Murang'a">
-    <meta name="author" content="Jonah Njugi">
-    
+    <title>Keja Yangu | Find Student Hostels in Murang'a</title>
+    <meta name="description" content="Find verified student hostels near Murang'a University. View photos, prices, and contact landlords directly on Keja Yangu.">
     <meta name="google-site-verification" content="EzcON8QwIQyX0OpMwhxzkt6bNy-hQllhnWSxOzHmng0" />
-
-    <meta property="og:title" content="Keja Yangu | Find Your Next Keja">
-    <meta property="og:description" content="The easiest way to find student housing in Murang'a. Verified listings only.">
-    <meta property="og:image" content="https://i.ibb.co/3mKNG8nV/House-logo.png">
-    <meta property="og:type" content="website">
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -22,67 +14,59 @@
 
     <style>
         :root { --navy: #1a237e; --red: #d32f2f; --bg: #f4f7f9; --blue: #2196F3; --gold: #ffc107; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; padding-bottom: 100px; }
-        .container { max-width: 500px; margin: 0 auto; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; padding-bottom: 50px; }
+        .container { max-width: 500px; margin: 0 auto; padding: 15px; }
         
-        /* Header */
-        .header-brand { text-align: center; padding: 20px 0; }
-        .logo-img { width: 85px; height: 85px; border-radius: 20px; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .brand-name { color: var(--navy); margin-top: 12px; font-weight: 800; font-size: 1.8rem; letter-spacing: 1px; }
-        .user-label { font-size: 0.75rem; font-weight: bold; color: var(--blue); text-transform: uppercase; margin-top: 5px; display: block; }
-
-        /* General UI */
-        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: none; margin-bottom: 20px; border: 1px solid #eee; }
+        /* Branding */
+        .header { text-align: center; padding: 20px 0; background: white; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
+        .logo-img { width: 70px; border-radius: 15px; }
+        
+        /* UI Elements */
+        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: none; margin-bottom: 20px; }
         input, select, .btn { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; font-size: 1rem; }
-        .btn-primary { background: var(--navy); color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-primary:active { transform: scale(0.98); }
-        
-        /* Warnings */
-        .scam-banner { background: #fff3cd; color: #856404; padding: 12px; border-radius: 12px; font-size: 0.85rem; text-align: center; border: 1px solid #ffeeba; margin-bottom: 15px; }
+        .btn-primary { background: var(--navy); color: white; border: none; font-weight: bold; cursor: pointer; }
+        .scam-banner { background: #fff3cd; color: #856404; padding: 10px; border-radius: 10px; font-size: 0.8rem; text-align: center; margin-bottom: 15px; }
 
-        /* House Display */
-        .house-card { background: white; border-radius: 18px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .house-img { width: 100%; height: 220px; object-fit: cover; background: #eee; }
-        .house-info { padding: 15px; }
-        .price { color: var(--red); font-size: 1.5rem; font-weight: 800; }
-        .verified-tick { color: var(--blue); font-size: 1.1rem; margin-left: 5px; }
-        
-        .action-btns { display: flex; gap: 15px; align-items: center; margin: 12px 0; font-size: 1.5rem; }
-        .btn-delete { color: var(--red); font-size: 0.85rem; border: none; background: none; cursor: pointer; margin-left: auto; font-weight: bold; }
+        /* Listing Grid */
+        .house-card { background: white; border-radius: 18px; overflow: hidden; margin-bottom: 20px; cursor: pointer; border: 1px solid #eee; transition: 0.2s; }
+        .house-card:active { transform: scale(0.98); }
+        .house-img-preview { width: 100%; height: 180px; object-fit: cover; background: #eee; }
+        .house-brief { padding: 15px; }
+        .price { color: var(--red); font-size: 1.3rem; font-weight: 800; }
 
-        /* Admin UI */
-        .admin-box { background: #fff; border: 2.5px solid var(--gold); padding: 15px; border-radius: 15px; margin-top: 25px; display: none; }
-        .admin-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; font-size: 0.85rem; }
+        /* Detail View */
+        #detail-view { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 100; display: none; overflow-y: auto; }
+        .gallery-container { display: flex; overflow-x: auto; gap: 10px; padding: 10px; scroll-snap-type: x mandatory; }
+        .gallery-img { width: 85%; height: 250px; flex-shrink: 0; object-fit: cover; border-radius: 15px; scroll-snap-align: center; background: #eee; }
+        .back-btn { position: sticky; top: 15px; left: 15px; background: rgba(255,255,255,0.9); border: none; padding: 10px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; z-index: 101; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
 
+        /* Admin/Tabs */
         .tab-bar { display: flex; gap: 10px; margin-bottom: 15px; }
-        .tab { flex: 1; padding: 12px; text-align: center; background: #e0e0e0; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
+        .tab { flex: 1; padding: 12px; text-align: center; background: #e0e0e0; border-radius: 12px; cursor: pointer; font-weight: bold; }
         .tab.active { background: var(--navy); color: white; }
-
-        footer { text-align: center; padding: 30px 10px; font-size: 0.8rem; color: #888; border-top: 1px solid #eee; margin-top: 20px; }
+        .admin-box { background: #fff; border: 2px solid var(--gold); padding: 15px; border-radius: 15px; display: none; }
+        .verified-tick { color: var(--blue); font-size: 1.1rem; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header-brand">
-        <img id="main-logo" src="https://i.ibb.co/3mKNG8nV/House-logo.png" 
-             onerror="this.src='https://cdn-icons-png.flaticon.com/512/25/25694.png'" 
-             class="logo-img" alt="Keja Yangu Logo">
-        <div class="brand-name">KEJA YANGU</div>
-        <span id="role-tag" class="user-label"></span>
+<div id="main-content" class="container">
+    <div class="header">
+        <img src="https://i.ibb.co/3mKNG8nV/House-logo.png" class="logo-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/25/25694.png'">
+        <h2 style="margin:5px 0; color:var(--navy);">KEJA YANGU</h2>
+        <span id="role-tag" style="font-size:0.7rem; color:var(--blue); font-weight:bold;"></span>
     </div>
 
     <div id="auth-screen" class="card" style="display: block;">
-        <div class="scam-banner">📢 <b>Safety Tip:</b> Only pay after you have keys in hand. Avoid online deposits to strangers.</div>
+        <div class="scam-banner">⚠️ Visit the house before paying! No online deposits.</div>
         <input type="email" id="email" placeholder="Email">
         <input type="password" id="pass" placeholder="Password">
         <select id="role">
-            <option value="student">I am a Student</option>
-            <option value="landlord">I am a Landlord</option>
+            <option value="student">Student</option>
+            <option value="landlord">Landlord</option>
         </select>
-        <button onclick="authAction('login')" class="btn btn-primary">Sign In</button>
-        <button onclick="authAction('signup')" class="btn" style="background:none; border:1px solid var(--navy); color:var(--navy);">Join Now</button>
-        <p onclick="forgotPassword()" style="text-align:center; font-size:0.8rem; color:#777; cursor:pointer; margin-top:10px;">Reset Password</p>
+        <button onclick="authAction('login')" class="btn btn-primary">Login</button>
+        <button onclick="authAction('signup')" class="btn" style="background:none; border:1px solid var(--navy);">Register</button>
     </div>
 
     <div id="market-screen" class="card">
@@ -91,33 +75,45 @@
             <div id="tab-liked" class="tab" onclick="switchTab('liked')">Saved ❤️</div>
         </div>
         <input type="text" id="search" placeholder="🔍 Search Hostels..." onkeyup="drawMarket()">
-        <div id="market-list">Finding houses...</div>
-
+        <div id="market-list"></div>
+        
         <div id="admin-panel" class="admin-box">
-            <h4 style="margin:0 0 10px 0; color:var(--navy);">🛡️ Admin Panel</h4>
+            <h4 style="margin:0 0 10px 0;">🛡️ Landlord Verification</h4>
             <div id="admin-user-list"></div>
         </div>
-        <button onclick="auth.signOut()" class="btn" style="margin-top:20px; color:var(--red); border:none; background:none; font-weight:bold;">Logout</button>
+        <button onclick="auth.signOut()" class="btn" style="margin-top:20px; border:none; color:var(--red); background:none;">Logout</button>
     </div>
 
     <div id="landlord-screen" class="card">
-        <h3>List Your Property</h3>
-        <input type="text" id="h-name" placeholder="Name of House/Hostel">
-        <input type="number" id="h-price" placeholder="Rent per Month">
-        <input type="text" id="h-phone" placeholder="WhatsApp Number">
-        <input type="text" id="h-dist" placeholder="Distance (e.g. 200m)">
-        <input type="text" id="h-img" placeholder="Photo URL">
-        <button onclick="saveHouse()" class="btn btn-primary">Post Property</button>
+        <h3>Post Hostel</h3>
+        <input type="text" id="h-name" placeholder="Name">
+        <input type="number" id="h-price" placeholder="Price (Ksh)">
+        <input type="text" id="h-phone" placeholder="WhatsApp (254...)">
+        <input type="text" id="h-dist" placeholder="Distance">
+        <p style="font-size:0.8rem; color:#666; margin:5px 0;">Photo URLs (Paste 3 links):</p>
+        <input type="text" id="h-img1" placeholder="Image URL 1 (Main)">
+        <input type="text" id="h-img2" placeholder="Image URL 2">
+        <input type="text" id="h-img3" placeholder="Image URL 3">
+        <button onclick="saveHouse()" class="btn btn-primary">Publish</button>
         <hr>
-        <h4>My Ads</h4>
         <div id="my-listings"></div>
-        <button onclick="auth.signOut()" class="btn" style="color:var(--red); border:none; background:none; font-weight:bold;">Logout</button>
+        <button onclick="auth.signOut()" class="btn" style="color:var(--red); border:none; background:none;">Logout</button>
     </div>
+</div>
 
-    <footer>
-        <p>&copy; 2025 Keja Yangu Murang'a</p>
-        <p>Contact: jonahnjugi100@gmail.com</p>
-    </footer>
+<div id="detail-view">
+    <button class="back-btn" onclick="closeDetails()">← Back</button>
+    <div id="gallery" class="gallery-container"></div>
+    <div class="container">
+        <h2 id="det-name" style="margin:10px 0;"></h2>
+        <span id="det-price" class="price"></span>
+        <p id="det-dist" style="color:#666;"></p>
+        <div style="display:flex; gap:15px; margin:20px 0;">
+            <button id="det-wa" class="btn-primary" style="padding:15px; border-radius:12px; border:none; flex:1; cursor:pointer;">Contact on WhatsApp 💬</button>
+            <button id="det-like" style="background:none; border:1px solid #ddd; border-radius:12px; padding:10px 20px; font-size:1.5rem;"></button>
+        </div>
+        <div id="admin-delete-zone"></div>
+    </div>
 </div>
 
 <script>
@@ -147,20 +143,20 @@
             if(user.email === ADMIN_EMAIL) {
                 document.getElementById('market-screen').style.display = 'block';
                 document.getElementById('admin-panel').style.display = 'block';
-                document.getElementById('role-tag').innerText = "Administrator Mode";
+                document.getElementById('role-tag').innerText = "ADMINISTRATOR";
                 loadAdminTools();
             } else if(userData.role === 'landlord') {
                 document.getElementById('landlord-screen').style.display = 'block';
-                document.getElementById('role-tag').innerText = "Landlord Dashboard";
+                document.getElementById('role-tag').innerText = "LANDLORD";
             } else {
                 document.getElementById('market-screen').style.display = 'block';
-                document.getElementById('role-tag').innerText = "Student Dashboard";
+                document.getElementById('role-tag').innerText = "STUDENT";
             }
-            startDataSync();
+            syncData();
         }
     });
 
-    function startDataSync() {
+    function syncData() {
         db.collection('users').onSnapshot(snap => {
             snap.forEach(d => usersMap[d.id] = d.data());
             db.collection('houses').orderBy('createdAt', 'desc').onSnapshot(hSnap => {
@@ -180,51 +176,83 @@
         const term = document.getElementById('search').value.toLowerCase();
         list.innerHTML = "";
         const filtered = allHouses.filter(h => {
-            const matchSearch = h.name.toLowerCase().includes(term);
-            const matchTab = (currentTab === 'all') || (currentTab === 'liked' && myLikes.includes(h.id));
-            return matchSearch && matchTab;
+            const matchS = h.name.toLowerCase().includes(term);
+            const matchT = (currentTab === 'all') || (currentTab === 'liked' && myLikes.includes(h.id));
+            return matchS && matchT;
         });
-        if(filtered.length === 0) list.innerHTML = "<p style='text-align:center; padding:20px; color:#999;'>No matches found.</p>";
         filtered.forEach(h => {
             const isV = usersMap[h.ownerId]?.isVerified;
-            const liked = myLikes.includes(h.id);
-            const admin = auth.currentUser.email === ADMIN_EMAIL;
             list.innerHTML += `
-                <div class="house-card">
-                    <img src="${h.img || 'https://via.placeholder.com/400x220'}" class="house-img">
-                    <div class="house-info">
+                <div class="house-card" onclick="openDetails('${h.id}')">
+                    <img src="${h.images ? h.images[0] : 'https://via.placeholder.com/400x180'}" class="house-img-preview">
+                    <div class="house-brief">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <span class="price">Ksh ${h.price}</span>
                             <strong>${h.name} ${isV ? '<span class="verified-tick">✔</span>' : ''}</strong>
                         </div>
-                        <p style="color:#666; font-size:0.85rem;">📍 ${h.dist}</p>
-                        <div class="action-btns">
-                            <span onclick="toggleLike('${h.id}')" style="cursor:pointer;">${liked ? '❤️' : '🤍'}</span>
-                            <a href="https://wa.me/${h.phone}" style="text-decoration:none;">💬</a>
-                            ${admin ? `<span onclick="deleteHouse('${h.id}')" class="btn-delete">🗑️ Remove</span>` : ''}
-                        </div>
+                        <p style="margin:5px 0; font-size:0.8rem; color:#666;">📍 ${h.dist} | Click for details</p>
                     </div>
                 </div>`;
         });
     }
 
-    function loadAdminTools() {
-        db.collection('users').where('role', '==', 'landlord').onSnapshot(snap => {
-            const list = document.getElementById('admin-user-list');
-            list.innerHTML = "";
-            snap.forEach(doc => {
-                const u = doc.data();
-                list.innerHTML += `<div class="admin-row"><span>${u.email}</span><button onclick="toggleV('${doc.id}', ${!u.isVerified})">${u.isVerified ? '✅ VERIFIED' : '❌ UNVERIFIED'}</button></div>`;
+    // --- DETAIL VIEW LOGIC ---
+    function openDetails(hid) {
+        const h = allHouses.find(x => x.id === hid);
+        const isAdmin = auth.currentUser.email === ADMIN_EMAIL;
+        
+        // Build Gallery
+        const gallery = document.getElementById('gallery');
+        gallery.innerHTML = "";
+        if(h.images) {
+            h.images.filter(img => img !== "").forEach(img => {
+                gallery.innerHTML += `<img src="${img}" class="gallery-img">`;
             });
-        });
+        }
+
+        document.getElementById('det-name').innerText = h.name;
+        document.getElementById('det-price').innerText = "Ksh " + h.price + " / Month";
+        document.getElementById('det-dist').innerText = "📍 Location: " + h.dist + " from campus";
+        document.getElementById('det-wa').onclick = () => window.open(`https://wa.me/${h.phone}`);
+        document.getElementById('det-like').innerHTML = myLikes.includes(h.id) ? "❤️" : "🤍";
+        document.getElementById('det-like').onclick = () => toggleLike(h.id);
+        
+        const adminDel = document.getElementById('admin-delete-zone');
+        adminDel.innerHTML = isAdmin ? `<button onclick="deleteHouse('${h.id}')" style="width:100%; padding:10px; color:red; border:1px solid red; background:none; border-radius:10px; margin-top:20px;">🗑️ DELETE THIS LISTING</button>` : '';
+
+        document.getElementById('detail-view').style.display = "block";
+        document.body.style.overflow = "hidden"; // Prevent background scroll
     }
 
-    async function toggleV(u, s) { await db.collection('users').doc(u).update({ isVerified: s }); }
-    async function deleteHouse(id) { if(confirm("Remove listing?")) await db.collection('houses').doc(id).delete(); }
+    function closeDetails() {
+        document.getElementById('detail-view').style.display = "none";
+        document.body.style.overflow = "auto";
+    }
+
+    // --- UTILS ---
+    async function saveHouse() {
+        const imgs = [
+            document.getElementById('h-img1').value,
+            document.getElementById('h-img2').value,
+            document.getElementById('h-img3').value
+        ];
+        const h = {
+            name: document.getElementById('h-name').value,
+            price: document.getElementById('h-price').value,
+            phone: document.getElementById('h-phone').value,
+            dist: document.getElementById('h-dist').value,
+            images: imgs,
+            ownerId: auth.currentUser.uid,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        await db.collection('houses').add(h);
+        alert("Published! Students can now click to view details.");
+    }
 
     async function toggleLike(id) {
         let n = myLikes.includes(id) ? myLikes.filter(x => x !== id) : [...myLikes, id];
         await db.collection('likes').doc(auth.currentUser.uid).set({ houseIds: n });
+        document.getElementById('det-like').innerHTML = n.includes(id) ? "❤️" : "🤍";
     }
 
     function switchTab(t) {
@@ -234,25 +262,26 @@
         drawMarket();
     }
 
-    async function saveHouse() {
-        const h = {
-            name: document.getElementById('h-name').value,
-            price: document.getElementById('h-price').value,
-            phone: document.getElementById('h-phone').value,
-            dist: document.getElementById('h-dist').value,
-            img: document.getElementById('h-img').value,
-            ownerId: auth.currentUser.uid,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        };
-        await db.collection('houses').add(h);
-        alert("Published!");
+    function loadAdminTools() {
+        db.collection('users').where('role', '==', 'landlord').onSnapshot(snap => {
+            const list = document.getElementById('admin-user-list');
+            list.innerHTML = "";
+            snap.forEach(doc => {
+                const u = doc.data();
+                list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee; font-size:0.8rem;">
+                    <span>${u.email}</span>
+                    <button onclick="toggleV('${doc.id}', ${!u.isVerified})">${u.isVerified ? '✅ VERIFIED' : '❌ UNVERIFIED'}</button>
+                </div>`;
+            });
+        });
     }
 
-    function drawLandlordList() {
-        const div = document.getElementById('my-listings'); div.innerHTML = "";
-        allHouses.filter(h => h.ownerId === auth.currentUser.uid).forEach(h => {
-            div.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><span>${h.name}</span><button onclick="deleteHouse('${h.id}')" style="color:red; border:none; background:none;">Delete</button></div>`;
-        });
+    async function toggleV(u, s) { await db.collection('users').doc(u).update({ isVerified: s }); }
+    async function deleteHouse(id) { 
+        if(confirm("Permanently delete?")) {
+            await db.collection('houses').doc(id).delete();
+            closeDetails();
+        }
     }
 
     function authAction(t) {
@@ -261,9 +290,11 @@
         else auth.createUserWithEmailAndPassword(e, p).then(x => db.collection('users').doc(x.user.uid).set({ email: e, role: r, isVerified: false }));
     }
 
-    function forgotPassword() {
-        const e = document.getElementById('email').value;
-        if(e) auth.sendPasswordResetEmail(e).then(() => alert("Email sent!"));
+    function drawLandlordList() {
+        const div = document.getElementById('my-listings'); div.innerHTML = "";
+        allHouses.filter(h => h.ownerId === auth.currentUser.uid).forEach(h => {
+            div.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><span>${h.name}</span><button onclick="deleteHouse('${h.id}')" style="color:red; border:none; background:none;">Delete</button></div>`;
+        });
     }
 </script>
 </body>
