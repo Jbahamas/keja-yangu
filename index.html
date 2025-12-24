@@ -3,14 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Keja Yangu | Official</title>
     
+    <title>Keja Yangu | Find Student Hostels in Murang'a</title>
+    <meta name="description" content="Keja Yangu is the #1 platform for Murang'a University students to find affordable, verified hostels and houses near campus. Search and connect with landlords directly.">
+    <meta name="keywords" content="Keja Yangu, Keja Yangu Murang'a, MUT Hostels, Student Housing Murang'a, Murang'a University Hostels, Cheap houses Murang'a">
+    <meta name="author" content="Jonah Njugi">
+    
+    <meta name="google-site-verification" content="PASTE_YOUR_CODE_HERE" />
+
+    <meta property="og:title" content="Keja Yangu | Murang'a Student Housing">
+    <meta property="og:description" content="Find your next Keja near Murang'a University. Verified landlords, real photos, and no middleman.">
+    <meta property="og:image" content="https://i.ibb.co/3mKNG8nV/House-logo.png">
+    <meta property="og:url" content="https://yourusername.github.io/kejayangu">
+
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <style>
-        :root { --navy: #1a237e; --red: #d32f2f; --bg: #f4f7f9; --blue: #2196F3; --gold: #ffc107; --success: #25d366; }
+        :root { --navy: #1a237e; --red: #d32f2f; --bg: #f4f7f9; --blue: #2196F3; --gold: #ffc107; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; padding-bottom: 100px; }
         .container { max-width: 500px; margin: 0 auto; }
         
@@ -20,15 +31,12 @@
         .brand-name { color: var(--navy); margin-top: 10px; font-weight: 800; font-size: 1.7rem; letter-spacing: 1px; }
         .user-label { font-size: 0.75rem; font-weight: bold; color: var(--blue); text-transform: uppercase; margin-top: 5px; display: block; }
 
-        /* General Cards */
         .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: none; margin-bottom: 20px; border: 1px solid #eee; }
         input, select, .btn { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; font-size: 1rem; }
         .btn-primary { background: var(--navy); color: white; border: none; font-weight: bold; cursor: pointer; }
         
-        /* Scam Warning */
         .scam-banner { background: #fff3cd; color: #856404; padding: 12px; border-radius: 12px; font-size: 0.8rem; text-align: center; border: 1px solid #ffeeba; margin-bottom: 15px; line-height: 1.4; }
 
-        /* House Listings */
         .house-card { background: white; border-radius: 18px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); position: relative; }
         .house-img { width: 100%; height: 220px; object-fit: cover; background: #eee; }
         .house-info { padding: 15px; }
@@ -38,11 +46,9 @@
         .action-btns { display: flex; gap: 15px; align-items: center; margin: 12px 0; font-size: 1.4rem; }
         .btn-delete { color: var(--red); font-size: 0.9rem; border: none; background: none; cursor: pointer; margin-left: auto; font-weight: bold; }
 
-        /* Admin Section */
         .admin-box { background: #fff; border: 2px solid var(--gold); padding: 15px; border-radius: 15px; margin-top: 25px; display: none; }
         .admin-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 0.85rem; }
 
-        /* Tabs */
         .tab-bar { display: flex; gap: 10px; margin-bottom: 15px; }
         .tab { flex: 1; padding: 12px; text-align: center; background: #e0e0e0; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
         .tab.active { background: var(--navy); color: white; }
@@ -51,12 +57,11 @@
     </style>
 </head>
 <body>
-
 <div class="container">
     <div class="header-brand">
         <img id="main-logo" src="https://i.ibb.co/3mKNG8nV/House-logo.png" 
              onerror="this.src='https://cdn-icons-png.flaticon.com/512/25/25694.png'" 
-             class="logo-img" alt="Logo">
+             class="logo-img" alt="Keja Yangu Logo">
         <div class="brand-name">KEJA YANGU</div>
         <span id="role-tag" class="user-label"></span>
     </div>
@@ -79,16 +84,12 @@
             <div id="tab-all" class="tab active" onclick="switchTab('all')">Marketplace</div>
             <div id="tab-liked" class="tab" onclick="switchTab('liked')">My Likes ❤️</div>
         </div>
-        
         <input type="text" id="search" placeholder="🔍 Search by hostel name..." onkeyup="drawMarket()">
-        
         <div id="market-list">Loading houses...</div>
-
         <div id="admin-panel" class="admin-box">
             <h4 style="margin:0 0 10px 0; color:var(--navy);">🛡️ Admin: Landlord Verification</h4>
             <div id="admin-user-list"></div>
         </div>
-
         <button onclick="auth.signOut()" class="btn" style="margin-top:25px; color:var(--red); border:none; background:none; font-weight:bold;">Logout</button>
     </div>
 
@@ -114,8 +115,6 @@
 
 <script>
     const ADMIN_EMAIL = "jonahnjugi100@gmail.com";
-    
-    // --- FIREBASE CONFIG ---
     const firebaseConfig = {
         apiKey: "AIzaSyCC8SA7FKzikzHwvA9A6dyrv0x2jguyPPQ",
         authDomain: "murang-a-student-housing.firebaseapp.com",
@@ -130,18 +129,15 @@
 
     let allHouses = [], usersMap = {}, myLikes = [], currentTab = 'all';
 
-    // --- AUTH OBSERVER ---
     auth.onAuthStateChanged(async user => {
         document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
         document.getElementById('admin-panel').style.display = 'none';
-        
         if(!user) {
             document.getElementById('auth-screen').style.display = 'block';
             document.getElementById('role-tag').innerText = "";
         } else {
             const doc = await db.collection('users').doc(user.uid).get();
             const userData = doc.data() || { role: 'student' };
-            
             if(user.email === ADMIN_EMAIL) {
                 document.getElementById('market-screen').style.display = 'block';
                 document.getElementById('admin-panel').style.display = 'block';
@@ -159,48 +155,37 @@
     });
 
     function initApp() {
-        // Load Landlord verification statuses
         db.collection('users').onSnapshot(snap => {
             snap.forEach(d => usersMap[d.id] = d.data());
-            // Load Houses
             db.collection('houses').orderBy('createdAt', 'desc').onSnapshot(hSnap => {
                 allHouses = hSnap.docs.map(d => ({ id: d.id, ...d.data() }));
                 drawMarket();
                 if(document.getElementById('my-listings')) drawLandlordList();
             });
         });
-        // Load User Likes
         db.collection('likes').doc(auth.currentUser.uid).onSnapshot(doc => {
             myLikes = doc.exists ? doc.data().houseIds : [];
             drawMarket();
         });
     }
 
-    // --- MARKETPLACE LOGIC ---
     function drawMarket() {
         const list = document.getElementById('market-list');
         const searchTerm = document.getElementById('search').value.toLowerCase();
         list.innerHTML = "";
-
         const filtered = allHouses.filter(h => {
             const matchesSearch = h.name.toLowerCase().includes(searchTerm);
             const matchesTab = (currentTab === 'all') || (currentTab === 'liked' && myLikes.includes(h.id));
             return matchesSearch && matchesTab;
         });
-
-        if(filtered.length === 0) {
-            list.innerHTML = `<p style="text-align:center; padding:20px; color:#999;">No houses found here yet.</p>`;
-            return;
-        }
-
+        if(filtered.length === 0) { list.innerHTML = `<p style="text-align:center; padding:20px; color:#999;">No houses found.</p>`; return; }
         filtered.forEach(h => {
             const isVerified = usersMap[h.ownerId]?.isVerified;
             const isLiked = myLikes.includes(h.id);
             const isAdmin = auth.currentUser.email === ADMIN_EMAIL;
-
             list.innerHTML += `
                 <div class="house-card">
-                    <img src="${h.img || 'https://via.placeholder.com/400x220?text=No+Image+Provided'}" class="house-img">
+                    <img src="${h.img || 'https://via.placeholder.com/400x220?text=No+Image'}" class="house-img">
                     <div class="house-info">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <span class="price">Ksh ${h.price}</span>
@@ -217,29 +202,20 @@
         });
     }
 
-    // --- ADMIN TOOLS ---
     function loadAdminPanel() {
         db.collection('users').where('role', '==', 'landlord').onSnapshot(snap => {
             const list = document.getElementById('admin-user-list');
             list.innerHTML = "";
             snap.forEach(doc => {
                 const u = doc.data();
-                list.innerHTML += `
-                    <div class="admin-row">
-                        <span>${u.email}</span>
-                        <button onclick="verifyLandlord('${doc.id}', ${!u.isVerified})" 
-                                style="font-size:0.7rem; padding:4px 8px; border-radius:5px; border:1px solid #ddd; cursor:pointer;">
-                            ${u.isVerified ? '✅ VERIFIED' : '❌ NOT VERIFIED'}
-                        </button>
-                    </div>`;
+                list.innerHTML += `<div class="admin-row"><span>${u.email}</span><button onclick="verifyLandlord('${doc.id}', ${!u.isVerified})">${u.isVerified ? '✅ VERIFIED' : '❌ UNVERIFIED'}</button></div>`;
             });
         });
     }
 
     async function verifyLandlord(uid, status) { await db.collection('users').doc(uid).update({ isVerified: status }); }
-    async function deleteHouse(hid) { if(confirm("Permanently delete this listing?")) await db.collection('houses').doc(hid).delete(); }
+    async function deleteHouse(hid) { if(confirm("Permanently delete?")) await db.collection('houses').doc(hid).delete(); }
 
-    // --- ACTIONS ---
     async function toggleLike(hid) {
         let updatedLikes = myLikes.includes(hid) ? myLikes.filter(id => id !== hid) : [...myLikes, hid];
         await db.collection('likes').doc(auth.currentUser.uid).set({ houseIds: updatedLikes });
@@ -262,33 +238,26 @@
             ownerId: auth.currentUser.uid,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         };
-        if(!h.name || !h.price || !h.phone) return alert("Fill Name, Price and WhatsApp Number!");
         await db.collection('houses').add(h);
-        alert("Published Successfully!");
+        alert("Published!");
     }
 
     function drawLandlordList() {
-        const div = document.getElementById('my-listings');
-        div.innerHTML = "";
+        const div = document.getElementById('my-listings'); div.innerHTML = "";
         allHouses.filter(h => h.ownerId === auth.currentUser.uid).forEach(h => {
-            div.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;">
-                <span>${h.name}</span>
-                <button onclick="deleteHouse('${h.id}')" style="color:red; border:none; background:none;">Delete</button>
-            </div>`;
+            div.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><span>${h.name}</span><button onclick="deleteHouse('${h.id}')" style="color:red; border:none; background:none;">Delete</button></div>`;
         });
     }
 
     function authAction(type) {
         const e = document.getElementById('email').value, p = document.getElementById('pass').value, r = document.getElementById('role').value;
-        if(!e || !p) return alert("Enter email and password");
-        if(type === 'login') auth.signInWithEmailAndPassword(e, p).catch(err => alert("Login failed: " + err.message));
+        if(type === 'login') auth.signInWithEmailAndPassword(e, p).catch(err => alert(err.message));
         else auth.createUserWithEmailAndPassword(e, p).then(res => db.collection('users').doc(res.user.uid).set({ email: e, role: r, isVerified: false }));
     }
 
     function forgotPassword() {
         const e = document.getElementById('email').value;
-        if(!e) return alert("Enter email address first!");
-        auth.sendPasswordResetEmail(e).then(() => alert("Password reset link sent to your email."));
+        if(e) auth.sendPasswordResetEmail(e).then(() => alert("Reset link sent!"));
     }
 </script>
 </body>
