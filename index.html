@@ -3,133 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Keja Yangu Murang'a | Verified Student Hostels</title>
+    <title>Keja Yangu | Official Murang'a Student Housing</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <style>
-        :root { --navy: #0a192f; --blue: #007bff; --red: #dc3545; --light: #f8f9fa; --gray: #6c757d; }
-        body { font-family: 'Inter', sans-serif; background: var(--light); margin: 0; color: #333; line-height: 1.6; }
+        :root { --navy: #0a192f; --blue: #007bff; --red: #e63946; --light: #f8f9fa; --success: #2ecc71; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--light); margin: 0; color: #333; padding-bottom: 80px; }
         
-        /* Professional Header */
-        .top-bar { background: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .logo-area { display: flex; align-items: center; gap: 10px; }
-        .logo-img { width: 35px; height: 35px; border-radius: 6px; }
-        .brand { font-size: 1.1rem; font-weight: 800; color: var(--navy); letter-spacing: -0.5px; }
-        .btn-logout { background: white; color: var(--red); border: 1.5px solid var(--red); padding: 5px 15px; border-radius: 8px; font-weight: 700; cursor: pointer; display: none; font-size: 0.8rem; transition: 0.3s; }
-        .btn-logout:hover { background: var(--red); color: white; }
+        /* Top Navigation Header */
+        .header { background: white; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .logo-group { display: flex; align-items: center; gap: 10px; }
+        .brand-title { font-size: 1.1rem; font-weight: 900; color: var(--navy); letter-spacing: -0.5px; }
+        .logout-btn { background: #fff1f2; color: var(--red); border: 1.5px solid #fecaca; padding: 6px 15px; border-radius: 8px; font-weight: 700; cursor: pointer; display: none; font-size: 0.8rem; }
 
-        .container { max-width: 500px; margin: 0 auto; padding: 15px; }
+        .container { max-width: 480px; margin: 0 auto; padding: 15px; }
 
-        /* Card System */
-        .card { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); display: none; margin-bottom: 20px; border: 1px solid #eee; }
-        input, select, .btn { width: 100%; padding: 14px; margin: 10px 0; border: 1.5px solid #e0e0e0; border-radius: 10px; font-size: 1rem; box-sizing: border-box; }
+        /* Login & Forms */
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.04); display: none; margin-top: 10px; border: 1px solid #eee; }
+        input, select, .btn { width: 100%; padding: 14px; margin: 10px 0; border: 1.5px solid #e2e8f0; border-radius: 12px; font-size: 1rem; box-sizing: border-box; }
         .btn-primary { background: var(--navy); color: white; border: none; font-weight: 700; cursor: pointer; }
+        
+        .helper-links { display: flex; justify-content: space-between; font-size: 0.85rem; margin-top: 5px; }
+        .link { color: var(--blue); cursor: pointer; font-weight: 600; text-decoration: none; }
 
-        /* Listing Design */
-        .house-item { background: white; border-radius: 15px; overflow: hidden; margin-bottom: 20px; border: 1px solid #eee; position: relative; }
-        .v-badge { position: absolute; top: 10px; left: 10px; background: var(--blue); color: white; padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; z-index: 10; }
-        .house-img { width: 100%; height: 200px; object-fit: cover; }
-        .house-body { padding: 15px; }
-        .price { font-size: 1.25rem; font-weight: 800; color: var(--navy); }
+        /* Listing Cards */
+        .house-box { background: white; border-radius: 18px; overflow: hidden; margin-bottom: 20px; border: 1px solid #eee; position: relative; }
+        .v-tag { position: absolute; top: 12px; left: 12px; background: var(--blue); color: white; padding: 4px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; z-index: 10; }
+        .house-img { width: 100%; height: 210px; object-fit: cover; }
+        .house-details { padding: 15px; }
+        .price-text { font-size: 1.3rem; font-weight: 800; color: var(--navy); }
 
-        /* Professional Footer */
-        .site-footer { background: #fff; padding: 40px 20px; border-top: 1px solid #eee; text-align: center; font-size: 0.85rem; color: var(--gray); margin-top: 40px; }
-        .footer-links { margin: 15px 0; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
-        .footer-links a { color: var(--blue); text-decoration: none; font-weight: 600; cursor: pointer; }
-        .legal-box { font-size: 0.75rem; background: #fdfdfd; padding: 15px; border-radius: 10px; border: 1px solid #f0f0f0; margin-top: 20px; text-align: left; line-height: 1.4; }
+        /* Footer & Legal */
+        footer { background: white; padding: 30px 20px; border-top: 1px solid #eee; text-align: center; color: #64748b; font-size: 0.8rem; }
+        .disclaimer-box { background: #f8fafc; padding: 15px; border-radius: 12px; margin-top: 15px; border: 1px solid #f1f5f9; text-align: left; line-height: 1.4; }
 
-        /* Navigation */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #eee; z-index: 999; }
-        .nav-btn { background: none; border: none; font-size: 0.7rem; color: #888; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
-        .nav-btn.active { color: var(--navy); font-weight: bold; }
-
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 2000; display: none; overflow-y: auto; padding-top: 20px; }
+        /* Bottom Nav */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #eee; z-index: 999; }
+        .nav-item { background: none; border: none; font-size: 0.75rem; color: #94a3b8; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .nav-item.active { color: var(--navy); font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="top-bar">
-    <div class="logo-area">
-        <img src="https://i.ibb.co/3mKNG8nV/House-logo.png" class="logo-img">
-        <span class="brand">KEJA YANGU</span>
+<header class="header">
+    <div class="logo-group">
+        <img src="https://i.ibb.co/3mKNG8nV/House-logo.png" style="width:32px; border-radius: 6px;">
+        <span class="brand-title">KEJA YANGU</span>
     </div>
-    <button id="logout-btn" class="btn-logout" onclick="auth.signOut()">Log Out</button>
-</div>
+    <button id="global-logout" class="logout-btn" onclick="auth.signOut()">Log Out</button>
+</header>
 
 <div class="container">
     <div id="auth-screen" class="card" style="display: block;">
-        <h2 style="margin-top:0;">Account Access</h2>
+        <h2 style="margin: 0 0 10px 0;">Welcome</h2>
+        <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 20px;">Secure student housing at your fingertips.</p>
+        
         <input type="email" id="email" placeholder="Email Address">
         <input type="password" id="pass" placeholder="Password">
-        <select id="role">
-            <option value="student">Student (Looking for room)</option>
-            <option value="landlord">Landlord (Posting a room)</option>
-        </select>
-        <button onclick="authAction('login')" class="btn btn-primary">Sign In</button>
-        <button onclick="authAction('signup')" class="btn" style="border:none; color:var(--blue);">No account? Register here</button>
+        
+        <div class="helper-links">
+            <span class="link" onclick="forgotPassword()">Forgot Password?</span>
+            <span class="link" onclick="toggleAuthMode()" id="auth-toggle-text">Create Account</span>
+        </div>
+
+        <div id="signup-only" style="display: none; margin-top: 10px;">
+            <select id="role">
+                <option value="student">I am a Student</option>
+                <option value="landlord">I am a Landlord</option>
+            </select>
+        </div>
+
+        <button id="auth-btn" onclick="authAction()" class="btn btn-primary">Sign In</button>
     </div>
 
     <div id="market-screen" class="card">
-        <input type="text" id="search" placeholder="🔍 Search by hostel name or location..." onkeyup="drawMarket()">
+        <input type="text" id="search" placeholder="🔍 Search hostels in Murang'a..." onkeyup="drawMarket()">
         <div id="market-list"></div>
     </div>
 
     <div id="landlord-screen" class="card">
-        <h3 style="margin-top:0;">Post Property</h3>
+        <h3 style="margin-top:0;">List Your House</h3>
         <input type="text" id="h-name" placeholder="Hostel Name">
-        <input type="number" id="h-price" placeholder="Monthly Rent (Ksh)">
-        <input type="text" id="h-phone" placeholder="WhatsApp (e.g. 254712345678)">
-        <input type="text" id="h-dist" placeholder="Distance from Campus">
-        <input type="text" id="h-img1" placeholder="Image URL (Main)">
+        <input type="number" id="h-price" placeholder="Rent (Ksh)">
+        <input type="text" id="h-phone" placeholder="WhatsApp Number (e.g. 254...)">
+        <input type="text" id="h-dist" placeholder="Distance (e.g. 5 mins walk)">
+        <input type="text" id="h-img1" placeholder="Direct Image URL">
         <button onclick="saveHouse()" class="btn btn-primary">Publish Listing</button>
         <hr>
-        <h4>Your Active Listings</h4>
+        <h4>Your Listings</h4>
         <div id="my-listings"></div>
     </div>
 </div>
 
-<div id="about-overlay" class="overlay">
-    <div class="container">
-        <button onclick="this.parentElement.parentElement.style.display='none'" class="btn" style="background:#eee; border:none; width:auto;">← Back</button>
-        <h2>About Keja Yangu Murang'a</h2>
-        <p>Founded to solve the housing crisis for Murang'a University students, Keja Yangu is a verified peer-to-peer marketplace.</p>
-        <h3>Our Services</h3>
-        <ul>
-            <li>Verified Hostels: We manually verify high-quality listings.</li>
-            <li>Zero Brokerage: Students talk to landlords directly via WhatsApp.</li>
-            <li>Trust Platform: Secure login and saved preferences.</li>
-        </ul>
-        <h3>Contact Us</h3>
-        <p>📧 <b>jonahnjugi100@gmail.com</b><br>📍 Murang'a, Kenya</p>
-    </div>
-</div>
-
-<footer class="site-footer">
-    <div class="logo-area" style="justify-content: center; margin-bottom: 10px;">
-        <img src="https://i.ibb.co/3mKNG8nV/House-logo.png" style="width:25px;">
-        <span style="font-weight:800; color:var(--navy);">KEJA YANGU</span>
-    </div>
-    <div class="footer-links">
-        <a onclick="document.getElementById('about-overlay').style.display='block'">About Us</a>
-        <a href="mailto:jonahnjugi100@gmail.com">Support</a>
-        <a onclick="alert('Terms: 1. No payments online. 2. Verify before rent. 3. Be honest.')">Terms</a>
-    </div>
-    
-    <div class="legal-box">
-        <b>Legal Disclaimer:</b> Keja Yangu Murang'a is an independent platform. We are NOT affiliated, associated, or endorsed by any other entities operating under the 'Keja Yangu' name outside of our local Murang'a operations. 
-        <br><br>
-        &copy; <script>document.write(new Date().getFullYear())</script> Jonah Njugi. All rights reserved. Content protected under Kenya Copyright Law.
+<footer>
+    <div style="font-weight: 800; color: var(--navy); margin-bottom: 10px;">KEJA YANGU MURANG'A</div>
+    <p>&copy; 2025 Jonah Njugi. All rights reserved.</p>
+    <div class="disclaimer-box">
+        <b>Legal Notice:</b> We are an independent local service for MUT students. We are not affiliated with other 'Keja Yangu' entities. <b>Safety Tip:</b> Do not pay booking fees before physical inspection.
     </div>
 </footer>
 
-<nav class="nav-bar" id="main-nav" style="display:none;">
-    <button class="nav-btn active" onclick="showTab('market')">🏠<span>Browse</span></button>
-    <button class="nav-btn" onclick="showTab('liked')">❤️<span>Saved</span></button>
-    <button class="nav-btn" onclick="showTab('post')">➕<span>Post</span></button>
-    <button class="nav-btn" onclick="document.getElementById('about-overlay').style.display='block'">ℹ️<span>Info</span></button>
+<nav class="bottom-nav" id="main-nav" style="display: none;">
+    <button class="nav-item active" onclick="showTab('market')">🏠<span>Browse</span></button>
+    <button class="nav-item" onclick="showTab('post')">➕<span>Post</span></button>
+    <button class="nav-item" onclick="alert('Support: jonahnjugi100@gmail.com')">ℹ️<span>Help</span></button>
 </nav>
 
 <script>
@@ -145,63 +125,71 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    let allHouses = [], myLikes = [], currentFilter = 'all';
+    let isSignup = false;
 
     auth.onAuthStateChanged(user => {
         if(!user) {
             document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
             document.getElementById('auth-screen').style.display = 'block';
             document.getElementById('main-nav').style.display = 'none';
-            document.getElementById('logout-btn').style.display = 'none';
+            document.getElementById('global-logout').style.display = 'none';
         } else {
             document.getElementById('main-nav').style.display = 'flex';
-            document.getElementById('logout-btn').style.display = 'block';
-            loadData();
+            document.getElementById('global-logout').style.display = 'block';
             showTab('market');
+            loadData();
         }
     });
 
-    function loadData() {
-        db.collection('houses').orderBy('createdAt', 'desc').onSnapshot(snap => {
-            allHouses = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-            drawMarket();
-            drawLandlordList();
-        });
-        db.collection('likes').doc(auth.currentUser.uid).onSnapshot(doc => {
-            myLikes = doc.exists ? doc.data().houseIds : [];
-            drawMarket();
-        });
+    function toggleAuthMode() {
+        isSignup = !isSignup;
+        document.getElementById('signup-only').style.display = isSignup ? 'block' : 'none';
+        document.getElementById('auth-btn').innerText = isSignup ? 'Create Account' : 'Sign In';
+        document.getElementById('auth-toggle-text').innerText = isSignup ? 'Back to Login' : 'Create Account';
+    }
+
+    function authAction() {
+        const e = document.getElementById('email').value, p = document.getElementById('pass').value;
+        if(!isSignup) {
+            auth.signInWithEmailAndPassword(e, p).catch(err => alert(err.message));
+        } else {
+            const r = document.getElementById('role').value;
+            auth.createUserWithEmailAndPassword(e, p).then(u => {
+                db.collection('users').doc(u.user.uid).set({ email: e, role: r });
+            }).catch(err => alert(err.message));
+        }
+    }
+
+    function forgotPassword() {
+        const email = document.getElementById('email').value;
+        if(!email) return alert("Please type your email first.");
+        auth.sendPasswordResetEmail(email).then(() => alert("Reset link sent to your email!"));
     }
 
     function showTab(t) {
         document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        if(t === 'market') { document.getElementById('market-screen').style.display = 'block'; currentFilter = 'all'; }
-        else if(t === 'liked') { document.getElementById('market-screen').style.display = 'block'; currentFilter = 'liked'; }
-        else if(t === 'post') { document.getElementById('landlord-screen').style.display = 'block'; }
+        if(t === 'market') document.getElementById('market-screen').style.display = 'block';
+        if(t === 'post') document.getElementById('landlord-screen').style.display = 'block';
     }
 
-    function drawMarket() {
-        const list = document.getElementById('market-list');
-        list.innerHTML = "";
-        const term = document.getElementById('search').value.toLowerCase();
-        
-        allHouses.filter(h => {
-            const matchesSearch = h.name.toLowerCase().includes(term);
-            const matchesLiked = currentFilter === 'all' || myLikes.includes(h.id);
-            return matchesSearch && matchesLiked;
-        }).forEach(h => {
-            list.innerHTML += `
-                <div class="house-item">
-                    <span class="v-badge">VERIFIED HOSTEL</span>
-                    <img src="${h.images[0]}" class="house-img" onerror="this.src='https://via.placeholder.com/400x200'">
-                    <div class="house-body">
-                        <span class="price">Ksh ${h.price}</span>
-                        <h3 style="margin:5px 0;">${h.name}</h3>
-                        <p style="color:#666; font-size:0.8rem;">📍 ${h.dist}</p>
-                        <button class="btn btn-primary" onclick="window.open('https://wa.me/${h.phone}')">WhatsApp Landlord</button>
-                    </div>
-                </div>`;
+    function loadData() {
+        db.collection('houses').orderBy('createdAt', 'desc').onSnapshot(snap => {
+            const list = document.getElementById('market-list');
+            list.innerHTML = "";
+            snap.forEach(doc => {
+                const h = { id: doc.id, ...doc.data() };
+                list.innerHTML += `
+                    <div class="house-box">
+                        <span class="v-tag">VERIFIED</span>
+                        <img src="${h.images[0]}" class="house-img" onerror="this.src='https://via.placeholder.com/400x200'">
+                        <div class="house-details">
+                            <span class="price-text">Ksh ${h.price}</span>
+                            <h3>${h.name}</h3>
+                            <p style="color:#64748b; font-size:0.85rem;">📍 ${h.dist}</p>
+                            <button class="btn btn-primary" style="background:#25d366;" onclick="window.open('https://wa.me/${h.phone}')">WhatsApp Landlord</button>
+                        </div>
+                    </div>`;
+            });
         });
     }
 
@@ -215,21 +203,8 @@
             ownerId: auth.currentUser.uid,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        alert("Listing live!");
+        alert("Published!");
         showTab('market');
-    }
-
-    function drawLandlordList() {
-        const div = document.getElementById('my-listings'); div.innerHTML = "";
-        allHouses.filter(h => h.ownerId === auth.currentUser.uid).forEach(h => {
-            div.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee;"><span>${h.name}</span><button onclick="db.collection('houses').doc('${h.id}').delete()" style="color:red; border:none; background:none;">Delete</button></div>`;
-        });
-    }
-
-    function authAction(t) {
-        const e = document.getElementById('email').value, p = document.getElementById('pass').value;
-        if(t === 'login') auth.signInWithEmailAndPassword(e, p).catch(a => alert(a.message));
-        else auth.createUserWithEmailAndPassword(e, p).then(u => db.collection('users').doc(u.user.uid).set({ email: e, role: document.getElementById('role').value }));
     }
 </script>
 </body>
