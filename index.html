@@ -22,13 +22,13 @@
         .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--gold); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Admin/Landlord Professional UI */
+        /* Admin/Landlord List Style */
         .admin-list-item { background: white; padding: 12px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
         .action-btns { display: flex; gap: 5px; }
         .action-btns button { border: none; padding: 8px; border-radius: 6px; cursor: pointer; color: white; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; }
 
-        /* Status Badges */
-        .badge-full { background: var(--red); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; position: absolute; top: 10px; left: 10px; z-index: 10; }
+        /* Status Badge for Occupancy */
+        .badge-full { background: var(--red); color: white; padding: 3px 8px; border-radius: 5px; font-size: 0.65rem; font-weight: bold; position: absolute; top: 10px; left: 10px; z-index: 10; }
 
         /* General UI */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 4000; overflow-y: auto; }
@@ -46,12 +46,12 @@
         .btn-gold { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: 800; background: linear-gradient(135deg, var(--gold), var(--gold-hover)); color: var(--white); cursor: pointer; }
         .btn-outline { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid var(--navy); font-weight: 800; background: transparent; margin-top: 8px; cursor: pointer; }
 
-        .featured-scroll { display: flex; overflow-x: auto; gap: 15px; padding-bottom: 15px; scrollbar-width: none; }
-        .featured-card { min-width: 260px; background: white; border-radius: 15px; border: 2px solid var(--gold); overflow: hidden; flex-shrink: 0; cursor: pointer; position: relative; }
-
         .h-card { background: var(--white); border-radius: 20px; overflow: hidden; margin-bottom: 25px; border: 1px solid #e2e8f0; position: relative; cursor: pointer; }
         .img-stack { height: 210px; background: #e2e8f0; overflow: hidden; }
         .img-stack img { width: 100%; height: 100%; object-fit: cover; }
+
+        .like-btn { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.9); border: none; width: 35px; height: 35px; border-radius: 50%; color: #94a3b8; cursor: pointer; z-index: 15; transition: 0.2s; }
+        .like-btn.active { color: var(--red); }
 
         .nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--white); display: none; justify-content: space-around; padding: 12px 0; border-top: 1px solid #e2e8f0; z-index: 1000; }
         .nav-tab { background: none; border: none; color: #94a3b8; font-size: 0.65rem; font-weight: 600; text-align: center; }
@@ -92,7 +92,7 @@
 <div class="container">
     <section id="view-auth" class="view-pane" style="display: block;">
         <div class="card">
-            <h2>Student Housing Portal</h2>
+            <h2 style="margin-top:0;">Student Housing Portal</h2>
             <input type="email" id="auth-email" placeholder="Email Address">
             <input type="password" id="auth-pass" placeholder="Password">
             <div id="registration-fields" style="display:none;">
@@ -116,7 +116,7 @@
     <section id="view-student" class="view-pane">
         <div class="featured-section" id="premium-section" style="display:none;">
             <h4 style="margin-bottom:10px; color:var(--gold);"><i class="fas fa-crown"></i> Hot Deals</h4>
-            <div class="featured-scroll" id="featured-list"></div>
+            <div style="display: flex; overflow-x: auto; gap: 15px; padding-bottom: 15px; scrollbar-width: none;" id="featured-list"></div>
         </div>
         <input type="text" id="search-input" placeholder="🔍 Search hostel name..." onkeyup="renderMarket()" style="margin-bottom:15px;">
         <div id="market-list"></div>
@@ -139,9 +139,9 @@
     </section>
 
     <section id="view-admin" class="view-pane">
-        <div class="admin-header"><h3><i class="fas fa-user-shield"></i> Admin Dashboard</h3></div>
+        <div class="admin-header"><h3>🛡️ Admin Control</h3></div>
         <div id="admin-houses-list"></div>
-        <h4 style="margin-top:20px;">Users</h4>
+        <h4 style="margin-top:20px;">Platform Users</h4>
         <div id="admin-members-list"></div>
     </section>
 </div>
@@ -174,11 +174,17 @@
             document.getElementById('logout-btn').style.display = 'block';
             document.getElementById('main-nav').style.display = 'flex';
             const userDoc = await db.collection('users').doc(user.uid).get();
+            const role = userDoc.data()?.role;
+
+            // FIX: Only show Admin tab to the specific Admin Email
             if(user.email === ADMIN_EMAIL) {
                 document.getElementById('nav-admin').style.display = 'block';
                 document.getElementById('nav-landlord').style.display = 'block';
                 db.collection('users').onSnapshot(snap => { allUsers = snap.docs.map(d=>({id:d.id, ...d.data()})); renderAdminMembers(); });
-            } else document.getElementById('nav-landlord').style.display = (userDoc.data()?.role === 'landlord') ? 'block' : 'none';
+            } else {
+                document.getElementById('nav-admin').style.display = 'none';
+                document.getElementById('nav-landlord').style.display = (role === 'landlord') ? 'block' : 'none';
+            }
             switchView('student'); loadData();
         } else { switchView('auth'); document.getElementById('main-nav').style.display = 'none'; }
     });
@@ -201,24 +207,40 @@
 
         if(featured.length > 0) {
             pSec.style.display = 'block';
-            featured.forEach(h => fList.innerHTML += `
-                <div class="featured-card" onclick="viewHouse('${h.id}')">
+            featured.forEach(h => {
+                fList.innerHTML += `
+                <div style="min-width: 260px; background: white; border-radius: 15px; border: 2px solid var(--gold); overflow: hidden; flex-shrink: 0; cursor: pointer; position: relative;" onclick="viewHouse('${h.id}')">
                     ${h.isOccupied ? '<div class="badge-full">FULL</div>' : ''}
                     <div style="height:130px; background:#eee;"><img src="${h.images?.[0] || ''}" style="width:100%; height:100%; object-fit:cover;"></div>
                     <div style="padding:10px;"><b>Ksh ${h.price}</b><br><small>${h.name}</small></div>
-                </div>`);
+                </div>`;
+            });
         } else pSec.style.display = 'none';
 
         regular.forEach(h => {
+            const isLiked = likedHouses.includes(h.id);
             mList.innerHTML += `
                 <div class="h-card" onclick="viewHouse('${h.id}')">
                     ${h.isOccupied ? '<div class="badge-full">FULL</div>' : ''}
-                    <button class="like-btn ${likedHouses.includes(h.id)?'active':''}" onclick="event.stopPropagation(); toggleLike('${h.id}')"><i class="fas fa-heart"></i></button>
+                    <button class="like-btn ${isLiked ? 'active' : ''}" onclick="event.stopPropagation(); toggleLike('${h.id}')">
+                        <i class="fas fa-heart"></i>
+                    </button>
                     <div class="img-stack"><img src="${h.images?.[0] || ''}"></div>
                     <div style="padding:15px;"><b>Ksh ${h.price}</b><h4>${h.name} ${h.verified?'<i class="fas fa-check-circle" style="color:var(--green)"></i>':''}</h4>
                     <small><i class="fas fa-walking"></i> ${h.dist_meters || 0}m from MUT</small></div>
                 </div>`;
         });
+    }
+
+    function toggleLike(id) {
+        if(likedHouses.includes(id)) {
+            likedHouses = likedHouses.filter(i => i !== id);
+        } else {
+            likedHouses.push(id);
+        }
+        localStorage.setItem('keja_liked', JSON.stringify(likedHouses));
+        renderMarket(); 
+        renderLikes();
     }
 
     function viewHouse(id) {
@@ -246,26 +268,25 @@
         list.innerHTML = "<h4>My Listings</h4>";
         allHouses.filter(h => h.ownerId === auth.currentUser?.uid).forEach(h => {
             list.innerHTML += `<div class="admin-list-item">
-                <div><b>${h.name}</b><br><small>${h.isOccupied ? 'Occupied' : 'Available'}</small></div>
+                <div><b>${h.name}</b><br><small>${h.isOccupied ? 'Status: Full' : 'Status: Available'}</small></div>
                 <div class="action-btns">
-                    <button onclick="toggleOccupied('${h.id}', ${!h.isOccupied})" style="background:${h.isOccupied?'var(--red)':'var(--green)'}" title="Toggle Availability"><i class="fas fa-door-closed"></i></button>
+                    <button onclick="toggleOccupied('${h.id}', ${!h.isOccupied})" style="background:${h.isOccupied ? 'var(--green)' : 'var(--red)'}" title="Mark Occupied/Available">
+                        <i class="fas ${h.isOccupied ? 'fa-door-open' : 'fa-door-closed'}"></i>
+                    </button>
                     <button onclick="adminDelHouse('${h.id}')" style="background:var(--red)"><i class="fas fa-trash"></i></button>
                 </div>
             </div>`;
         });
     }
 
-    async function toggleOccupied(id, status) { await db.collection('houses').doc(id).update({isOccupied: status}); }
-    
-    // Auth & Admin Actions (Simplified for space but fully functional as before)
-    function handleAuth() {
-        const e = document.getElementById('auth-email').value, p = document.getElementById('auth-pass').value;
-        if(!e || !p) return alert("Fill all fields");
+    async function toggleOccupied(id, status) { 
         document.getElementById('loader').style.display = 'flex';
-        const isReg = document.getElementById('registration-fields').style.display === 'block';
-        if(isReg) { auth.createUserWithEmailAndPassword(e, p).then(u => db.collection('users').doc(u.user.uid).set({ email: e, role: document.getElementById('auth-role').value })).catch(err => { alert(err.message); document.getElementById('loader').style.display = 'none'; }); } 
-        else auth.signInWithEmailAndPassword(e, p).catch(err => { alert(err.message); document.getElementById('loader').style.display = 'none'; });
+        try {
+            await db.collection('houses').doc(id).update({ isOccupied: status });
+        } catch(e) { alert(e.message); }
+        document.getElementById('loader').style.display = 'none';
     }
+
     async function saveNewHostel() {
         const imgs = document.getElementById('post-images').value.split('\n').filter(i => i.trim());
         await db.collection('houses').add({
@@ -274,8 +295,9 @@
             amenities: document.getElementById('post-amenities').value, images: imgs, approved: false, verified: false, featured: false, isOccupied: false,
             ownerId: auth.currentUser.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        alert("Listing Shared!"); switchView('student');
+        alert("Listing Submitted!"); switchView('student');
     }
+
     function renderAdminProperties() {
         const list = document.getElementById('admin-houses-list'); list.innerHTML = "";
         allHouses.forEach(h => {
@@ -287,24 +309,33 @@
             </div></div>`;
         });
     }
+
     async function adminAction(id, type) {
         const h = allHouses.find(x => x.id === id);
         if(type === 'feat') await db.collection('houses').doc(id).update({featured: !h.featured});
         if(type === 'ver') await db.collection('houses').doc(id).update({verified: !h.verified});
         if(type === 'app') await db.collection('houses').doc(id).update({approved: !h.approved});
     }
-    function adminDelHouse(id) { if(confirm("Delete?")) db.collection('houses').doc(id).delete(); }
+
+    function adminDelHouse(id) { if(confirm("Delete this listing?")) db.collection('houses').doc(id).delete(); }
     function renderAdminMembers() {
         const list = document.getElementById('admin-members-list'); list.innerHTML = "";
-        allUsers.forEach(u => { if(u.email !== ADMIN_EMAIL) list.innerHTML += `<div class="admin-list-item"><div><b>${u.email}</b></div><button onclick="adminDelUser('${u.id}')" style="background:none; border:none; color:red;"><i class="fas fa-user-minus"></i></button></div>`; });
+        allUsers.forEach(u => { if(u.email !== ADMIN_EMAIL) list.innerHTML += `<div class="admin-list-item"><div><b>${u.email}</b><br><small>${u.role}</small></div><button onclick="adminDelUser('${u.id}')" style="background:none; border:none; color:red;"><i class="fas fa-user-minus"></i></button></div>`; });
     }
-    function adminDelUser(id) { if(confirm("Delete User?")) db.collection('users').doc(id).delete(); }
+    function adminDelUser(id) { if(confirm("Delete this User?")) db.collection('users').doc(id).delete(); }
+    function handleAuth() {
+        const e = document.getElementById('auth-email').value, p = document.getElementById('auth-pass').value;
+        if(!e || !p) return alert("Fill all fields");
+        document.getElementById('loader').style.display = 'flex';
+        const isReg = document.getElementById('registration-fields').style.display === 'block';
+        if(isReg) { auth.createUserWithEmailAndPassword(e, p).then(u => db.collection('users').doc(u.user.uid).set({ email: e, role: document.getElementById('auth-role').value })).catch(err => { alert(err.message); document.getElementById('loader').style.display = 'none'; }); } 
+        else auth.signInWithEmailAndPassword(e, p).catch(err => { alert(err.message); document.getElementById('loader').style.display = 'none'; });
+    }
     function toggleAuthMode() { const f = document.getElementById('registration-fields'), isLogin = f.style.display === 'none'; f.style.display = isLogin ? 'block' : 'none'; document.getElementById('auth-btn').innerText = isLogin ? 'Register' : 'Sign In'; }
     function switchView(id) { document.querySelectorAll('.view-pane').forEach(v => v.style.display = 'none'); document.getElementById('view-'+id).style.display = 'block'; document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active')); if(document.getElementById('tab-'+id)) document.getElementById('tab-'+id).classList.add('active'); }
     function closeModal() { document.getElementById('houseModal').style.display = 'none'; }
-    function toggleLike(id) { likedHouses.includes(id) ? likedHouses = likedHouses.filter(i => i !== id) : likedHouses.push(id); localStorage.setItem('keja_liked', JSON.stringify(likedHouses)); renderMarket(); renderLikes(); }
     function renderLikes() { const list = document.getElementById('likes-list'); list.innerHTML = ""; allHouses.filter(h => likedHouses.includes(h.id)).forEach(h => { list.innerHTML += `<div class="h-card" onclick="viewHouse('${h.id}')"><div class="img-stack"><img src="${h.images?.[0] || ''}"></div><div style="padding:15px;"><b>Ksh ${h.price}</b><h4>${h.name}</h4></div></div>`; }); }
-    function resetPassword() { const e = document.getElementById('auth-email').value; if(e) auth.sendPasswordResetEmail(e).then(() => alert("Sent!")); }
+    function resetPassword() { const e = document.getElementById('auth-email').value; if(e) auth.sendPasswordResetEmail(e).then(() => alert("Email sent!")); }
 </script>
 </body>
 </html>
