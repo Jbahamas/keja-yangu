@@ -19,7 +19,7 @@
         }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: #334155; margin: 0; padding-bottom: 90px; }
         
-        #loader { display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 5000; align-items: center; justify-content: center; flex-direction: column; }
+        #loader { display: flex; position: fixed; inset: 0; background: white; z-index: 5000; align-items: center; justify-content: center; flex-direction: column; }
         .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--gold); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
@@ -58,18 +58,22 @@
         .action-btns { display: flex; gap: 5px; }
         .action-btns button { border: none; padding: 8px; border-radius: 6px; cursor: pointer; color: white; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 4000; overflow-y: auto; }
-        .modal-content { background: white; max-width: 450px; margin: 15px auto; padding: 20px; border-radius: 20px; color: #334155; position: relative; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 4000; overflow-y: auto; }
+        .modal-content { background: white; max-width: 450px; margin: 15px auto; padding: 20px; border-radius: 20px; position: relative; }
         .img-scroll-container { display: flex; overflow-x: auto; gap: 10px; scrollbar-width: none; }
         .img-scroll-container img { width: 90%; flex-shrink: 0; border-radius: 12px; height: 240px; object-fit: cover; }
 
-        /* Preview System Styles */
         #upload-preview { display: flex; flex-wrap: wrap; gap: 10px; margin: 15px 0; }
         .preview-wrapper { position: relative; width: 80px; height: 80px; }
         .preview-wrapper img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; border: 1px solid #ddd; }
-        .remove-img { position: absolute; -5px; right: -5px; background: var(--red); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+        .remove-img { position: absolute; top: -5px; right: -5px; background: var(--red); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
         .support-fab { position: fixed; bottom: 85px; right: 20px; background: #25d366; color: white; width: 50px; height: 50px; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 3000; cursor: pointer; text-decoration: none; }
+        
+        /* Filter Styles */
+        .filter-row { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; scrollbar-width: none; padding-bottom: 5px; }
+        .filter-row select { flex: 1; min-width: 100px; margin: 0; padding: 10px; font-size: 13px; background: var(--white); border-color: #e2e8f0; }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -85,7 +89,8 @@
         <h2 id="modalTitle"></h2>
         <div id="modalImages" class="img-scroll-container"></div>
         <div style="margin-top:15px; border-top: 1px solid #eee; padding-top:10px;">
-            <b id="modalDistInfo" style="color:var(--blue); font-size:0.95rem;"></b>
+            <b id="modalDistInfo" style="color:var(--blue); font-size:0.95rem;"></b><br>
+            <span id="modalTypeInfo" style="font-size: 0.85rem; color: var(--slate); font-weight: bold;"></span>
             <p id="modalAmenities" style="font-size:0.9rem; margin-top:10px;"></p>
         </div>
         <div id="modalContactArea">
@@ -135,7 +140,32 @@
             <h4 style="color:var(--gold); margin-bottom:10px;"><i class="fas fa-crown"></i> Hot Deals</h4>
             <div style="display: flex; overflow-x: auto; gap: 15px; padding-bottom: 10px; scrollbar-width: none;" id="featured-list"></div>
         </div>
+        
         <input type="text" id="search-input" placeholder="🔍 Search hostels..." onkeyup="renderMarket()">
+        
+        <div class="filter-row">
+            <select id="filter-type" onchange="renderMarket()">
+                <option value="all">All Types</option>
+                <option value="Single Room">Single Room</option>
+                <option value="Bedsitter">Bedsitter</option>
+                <option value="One Bedroom">1 Bedroom</option>
+                <option value="Studio">Studio</option>
+            </select>
+            <select id="filter-price" onchange="renderMarket()">
+                <option value="all">Any Price</option>
+                <option value="3500">Under 3,500</option>
+                <option value="5000">Under 5,000</option>
+                <option value="7000">Under 7,000</option>
+                <option value="10000">Under 10,000</option>
+            </select>
+            <select id="filter-dist" onchange="renderMarket()">
+                <option value="all">Distance</option>
+                <option value="200">Under 200m</option>
+                <option value="500">Under 500m</option>
+                <option value="1000">Under 1km</option>
+            </select>
+        </div>
+
         <div id="market-list"></div>
     </section>
 
@@ -148,14 +178,21 @@
         <div class="card">
             <h3>Post Property</h3>
             <input type="text" id="post-name" placeholder="Hostel Name">
-            <input type="number" id="post-price" placeholder="Rent (Ksh)">
-            <input type="number" id="post-dist-val" placeholder="Distance (Meters)">
+            <select id="post-type">
+                <option value="" disabled selected>Select House Type</option>
+                <option value="Single Room">Single Room</option>
+                <option value="Bedsitter">Bedsitter</option>
+                <option value="One Bedroom">One Bedroom</option>
+                <option value="Studio">Studio</option>
+            </select>
+            <input type="number" id="post-price" placeholder="Rent (Ksh per month)">
+            <input type="number" id="post-dist-val" placeholder="Distance (Meters from MUT)">
             <input type="text" id="post-phone" placeholder="WhatsApp Phone (e.g 07123...)">
             <textarea id="post-amenities" placeholder="Amenities (e.g Water, Wi-Fi, Security)"></textarea>
             
             <p style="font-size: 0.85rem; font-weight: bold; margin-bottom: 5px;">House Photos</p>
             <button type="button" onclick="openUploadWidget()" class="btn-outline" style="border-style: dashed; color: var(--blue); border-color: var(--blue);">
-                <i class="fas fa-cloud-upload-alt"></i> Drag & Drop or Upload Photos
+                <i class="fas fa-cloud-upload-alt"></i> Upload Photos
             </button>
             <div id="upload-preview"></div>
 
@@ -173,9 +210,12 @@
             <div class="stat-card"><h2 id="stat-houses">0</h2><small>Hostels</small></div>
             <div class="stat-card" style="background:var(--green);"><h2 id="stat-earnings">0</h2><small>Featured Revenue (Ksh)</small></div>
         </div>
+        
         <h4 style="margin-top:20px;">Master Hostel Control</h4>
         <div id="admin-houses-list"></div>
+
         <h4 style="margin-top:30px;">Registered Members</h4>
+        <input type="text" id="admin-user-search" placeholder="🔍 Search user by email..." onkeyup="renderAdminData()" style="margin-bottom: 10px;">
         <div id="admin-members-list"></div>
     </section>
 </div>
@@ -200,24 +240,19 @@
     const auth = firebase.auth(), db = firebase.firestore();
     const ADMIN_EMAIL = "jonahnjugi100@gmail.com";
     const FEATURE_PRICE = 500; 
-    let allHouses = [], likedHouses = JSON.parse(localStorage.getItem('keja_liked') || '[]');
-    let currentUploads = []; // Stores Cloudinary URLs
+    let allHouses = [], allUsers = [], likedHouses = JSON.parse(localStorage.getItem('keja_liked') || '[]');
+    let currentUploads = [];
 
-    // CLOUDINARY WIDGET LOGIC
+    // CLOUDINARY LOGIC
     function openUploadWidget() {
         cloudinary.openUploadWidget({
             cloudName: 'dtlpjxmf8', 
             uploadPreset: 'keja_preset',
-            sources: ['local', 'camera', 'url'],
-            showAdvancedOptions: false,
-            cropping: true,
-            multiple: true,
-            defaultSource: 'local',
-            styles: { palette: { window: "#FFFFFF", sourceBg: "#F4F4F5", windowBorder: "#90A0B3", tabIcon: "#0078FF", inactiveTabIcon: "#69778A", menuIcons: "#0078FF", link: "#0078FF", action: "#336BFF", inProgress: "#0078FF", complete: "#20B832", error: "#E24D4D", textDark: "#000000", textLight: "#FFFFFF" } }
+            sources: ['local', 'camera'],
+            multiple: true
         }, (error, result) => {
             if (!error && result && result.event === "success") {
-                const url = result.info.secure_url;
-                currentUploads.push(url);
+                currentUploads.push(result.info.secure_url);
                 renderUploadPreviews();
             }
         });
@@ -238,6 +273,7 @@
         renderUploadPreviews();
     }
 
+    // AUTH OBSERVER
     auth.onAuthStateChanged(async user => {
         document.getElementById('loader').style.display = 'none';
         if(user) {
@@ -246,6 +282,7 @@
             document.getElementById('support-btn').style.display = 'flex';
             const userDoc = await db.collection('users').doc(user.uid).get();
             const role = user.email === ADMIN_EMAIL ? 'admin' : (userDoc.exists ? userDoc.data().role : 'student');
+            
             if(role === 'admin') { 
                 document.getElementById('nav-admin-tab').style.display = 'block'; 
                 document.getElementById('nav-landlord-tab').style.display = 'block'; 
@@ -261,27 +298,40 @@
         db.collection('houses').orderBy('createdAt', 'desc').onSnapshot(snap => {
             allHouses = snap.docs.map(d => ({id: d.id, ...d.data()}));
             renderMarket(); renderLikes(); renderLandlordPanel();
-            if(auth.currentUser?.email === ADMIN_EMAIL) {
-                renderAdminProperties();
-                const featuredCount = allHouses.filter(h => h.featured).length;
-                document.getElementById('stat-houses').innerText = allHouses.length;
-                document.getElementById('stat-earnings').innerText = (featuredCount * FEATURE_PRICE).toLocaleString();
-                db.collection('users').onSnapshot(uSnap => {
-                    const users = uSnap.docs.map(ud => ({id: ud.id, ...ud.data()}));
-                    document.getElementById('stat-users').innerText = users.length;
-                    renderAdminMembers(users);
-                });
-            }
+            if(auth.currentUser?.email === ADMIN_EMAIL) fetchUsers();
         });
     }
 
+    function fetchUsers() {
+        db.collection('users').onSnapshot(uSnap => {
+            allUsers = uSnap.docs.map(ud => ({id: ud.id, ...ud.data()}));
+            renderAdminData();
+        });
+    }
+
+    // MARKETPLACE RENDERING
     function renderMarket() {
         const mList = document.getElementById('market-list'), fList = document.getElementById('featured-list'), pSec = document.getElementById('premium-section');
         const q = document.getElementById('search-input').value.toLowerCase();
+        const typeFilter = document.getElementById('filter-type').value;
+        const priceFilter = document.getElementById('filter-price').value;
+        const distFilter = document.getElementById('filter-dist').value;
+
         mList.innerHTML = ""; fList.innerHTML = "";
-        const filtered = allHouses.filter(h => h.approved && h.isVacant !== false && (h.name || "").toLowerCase().includes(q));
+        
+        const filtered = allHouses.filter(h => {
+            const matchesSearch = (h.name || "").toLowerCase().includes(q);
+            const matchesType = typeFilter === "all" || h.houseType === typeFilter;
+            const matchesPrice = priceFilter === "all" || parseInt(h.price) <= parseInt(priceFilter);
+            const matchesDist = distFilter === "all" || parseInt(h.dist_meters) <= parseInt(distFilter);
+            const isVisible = h.approved && h.isVacant !== false;
+            
+            return matchesSearch && matchesType && matchesPrice && matchesDist && isVisible;
+        });
+
         const featured = filtered.filter(h => h.featured);
         const regular = filtered.filter(h => !h.featured);
+
         if(featured.length > 0) {
             pSec.style.display = 'block';
             featured.forEach(h => {
@@ -291,25 +341,14 @@
                 </div>`;
             });
         } else pSec.style.display = 'none';
+
         regular.forEach(h => {
             mList.innerHTML += `<div class="h-card" onclick="viewHouse('${h.id}')">
                 <button class="like-btn ${likedHouses.includes(h.id)?'active':''}" onclick="event.stopPropagation(); toggleLike('${h.id}')"><i class="fas fa-heart"></i></button>
                 <div class="img-stack"><img src="${h.images?.[0] || ''}"></div>
-                <div style="padding:15px;"><b>Ksh ${h.price}</b><h4>${h.name} ${h.verified?'<i class="fas fa-check-circle" style="color:var(--green)"></i>':''}</h4></div>
+                <div style="padding:15px;"><b>Ksh ${h.price}</b><h4>${h.name} ${h.verified?'<i class="fas fa-check-circle" style="color:var(--green)"></i>':''}</h4>
+                <small style="color:var(--slate)">${h.houseType || 'Hostel'} • ${h.dist_meters}m away</small></div>
             </div>`;
-        });
-    }
-
-    function toggleLike(id) {
-        likedHouses.includes(id) ? likedHouses = likedHouses.filter(i => i !== id) : likedHouses.push(id);
-        localStorage.setItem('keja_liked', JSON.stringify(likedHouses));
-        renderMarket(); renderLikes();
-    }
-
-    function renderLikes() {
-        const list = document.getElementById('likes-list'); list.innerHTML = "";
-        allHouses.filter(h => likedHouses.includes(h.id)).forEach(h => {
-            list.innerHTML += `<div class="h-card" onclick="viewHouse('${h.id}')"><div class="img-stack"><img src="${h.images?.[0] || ''}"></div><div style="padding:15px;"><b>Ksh ${h.price}</b><h4>${h.name}</h4></div></div>`;
         });
     }
 
@@ -318,9 +357,10 @@
         if(!h) return;
         document.getElementById('modalTitle').innerText = h.name;
         document.getElementById('modalDistInfo').innerText = h.dist_meters + "m from MUT Gate";
+        document.getElementById('modalTypeInfo').innerText = "Type: " + (h.houseType || "N/A");
         document.getElementById('modalAmenities').innerText = h.amenities;
         document.getElementById('modalImages').innerHTML = (h.images || []).map(i => `<img src="${i}">`).join('');
-        document.getElementById('modalChat').onclick = () => window.open(`https://wa.me/${h.phone.replace(/^0/, '254')}`);
+        document.getElementById('modalChat').onclick = () => window.open(`https://wa.me/${h.phone.replace(/^0/, '254')}?text=Hi, I am interested in ${h.name}`);
         document.getElementById('modalCall').onclick = () => window.open(`tel:${h.phone}`);
         document.getElementById('houseModal').style.display = 'block';
     }
@@ -328,32 +368,31 @@
     async function saveNewHostel() {
         const name = document.getElementById('post-name').value;
         const price = document.getElementById('post-price').value;
-        const dist = document.getElementById('post-dist-val').value;
-        const phone = document.getElementById('post-phone').value;
-        const amens = document.getElementById('post-amenities').value;
-        
-        if(!name || !price || currentUploads.length === 0) return alert("Please fill all details and upload at least one photo.");
+        const houseType = document.getElementById('post-type').value;
+
+        if(!name || !price || !houseType || currentUploads.length === 0) return alert("Please fill all details and upload photos.");
 
         await db.collection('houses').add({ 
-            name, price, dist_meters: dist, 
-            phone: phone, amenities: amens, 
+            name, 
+            price: parseInt(price), 
+            houseType,
+            dist_meters: parseInt(document.getElementById('post-dist-val').value), 
+            phone: document.getElementById('post-phone').value, 
+            amenities: document.getElementById('post-amenities').value, 
             images: currentUploads, 
-            ownerId: auth.currentUser.uid, featured: false, approved: false, verified: false, isVacant: true, createdAt: firebase.firestore.FieldValue.serverTimestamp() 
+            ownerId: auth.currentUser.uid, 
+            featured: false, approved: false, verified: false, isVacant: true, 
+            createdAt: firebase.firestore.FieldValue.serverTimestamp() 
         });
 
-        const adminMsg = `Hello Jonah, I have just listed a new hostel: *${name}* at *Ksh ${price}*. Please review and approve it on the Keja Yangu Portal.`;
-        window.open(`https://wa.me/254720680769?text=${encodeURIComponent(adminMsg)}`);
-        
-        // Reset
-        currentUploads = [];
-        document.getElementById('upload-preview').innerHTML = "";
-        alert("Published! Notification sent to Admin."); switchView('student');
+        window.open(`https://wa.me/254720680769?text=Listed New Hostel: *${name}*`);
+        currentUploads = []; document.getElementById('upload-preview').innerHTML = "";
+        alert("Published! Admin will review shortly."); switchView('student');
     }
 
     function renderLandlordPanel() {
         const list = document.getElementById('landlord-listings'); list.innerHTML = "";
-        const myKejas = allHouses.filter(h => h.ownerId === auth.currentUser?.uid);
-        myKejas.forEach(h => {
+        allHouses.filter(h => h.ownerId === auth.currentUser?.uid).forEach(h => {
             list.innerHTML += `<div class="admin-list-item">
                 <div><b>${h.name}</b><br><small>${h.isVacant !== false ? '✅ Vacant' : '🚫 Occupied'}</small></div>
                 <div class="action-btns">
@@ -369,67 +408,89 @@
         await db.collection('houses').doc(id).update({isVacant: !(h.isVacant !== false)});
     }
 
-    function renderAdminProperties() {
-        const list = document.getElementById('admin-houses-list'); list.innerHTML = "";
-        allHouses.forEach(h => {
-            list.innerHTML += `<div class="admin-list-item">
+    // ADMIN DATA RENDERING
+    function renderAdminData() {
+        const userQ = document.getElementById('admin-user-search').value.toLowerCase();
+        
+        document.getElementById('stat-houses').innerText = allHouses.length;
+        document.getElementById('stat-earnings').innerText = (allHouses.filter(h => h.featured).length * FEATURE_PRICE).toLocaleString();
+        document.getElementById('stat-users').innerText = allUsers.length;
+        
+        const filteredUsers = allUsers.filter(u => (u.email || "").toLowerCase().includes(userQ));
+
+        document.getElementById('admin-members-list').innerHTML = filteredUsers.map(u => `
+            <div class="admin-list-item">
+                <div><b>${u.email}</b><br><small>${u.role}</small></div>
+                <button onclick="adminDelUser('${u.id}')" style="color:red; background:none; border:none;"><i class="fas fa-user-minus"></i></button>
+            </div>
+        `).join('');
+
+        document.getElementById('admin-houses-list').innerHTML = allHouses.map(h => `
+            <div class="admin-list-item">
                 <div><b>${h.name}</b></div>
                 <div class="action-btns">
-                    <button title="Hot Deal" onclick="adminAction('${h.id}', 'feat')" style="background:${h.featured?'var(--navy)':'#ddd'}"><i class="fas fa-star"></i></button>
-                    <button title="Verify" onclick="adminAction('${h.id}', 'ver')" style="background:${h.verified?'var(--blue)':'#ddd'}"><i class="fas fa-check"></i></button>
-                    <button title="Approve" onclick="adminAction('${h.id}', 'app')" style="background:${h.approved?'var(--green)':'#ddd'}"><i class="fas fa-eye"></i></button>
-                    <button title="Delete" onclick="adminDelHouse('${h.id}')" style="background:var(--red)"><i class="fas fa-trash"></i></button>
+                    <button onclick="adminAction('${h.id}', 'feat')" style="background:${h.featured?'var(--navy)':'#ddd'}"><i class="fas fa-star"></i></button>
+                    <button onclick="adminAction('${h.id}', 'ver')" style="background:${h.verified?'var(--blue)':'#ddd'}"><i class="fas fa-check"></i></button>
+                    <button onclick="adminAction('${h.id}', 'app')" style="background:${h.approved?'var(--green)':'#ddd'}"><i class="fas fa-eye"></i></button>
+                    <button onclick="adminDelHouse('${h.id}')" style="background:var(--red)"><i class="fas fa-trash"></i></button>
                 </div>
-            </div>`;
-        });
-    }
-
-    function renderAdminMembers(users) {
-        const list = document.getElementById('admin-members-list'); list.innerHTML = "";
-        users.forEach(u => {
-            if(u.email === ADMIN_EMAIL) return;
-            list.innerHTML += `<div class="admin-list-item">
-                <div><b>${u.email}</b><br><small>${u.role}</small></div>
-                <button onclick="adminDelUser('${u.id}')" style="background:none; border:none; color:red; cursor:pointer;"><i class="fas fa-user-minus"></i></button>
-            </div>`;
-        });
+            </div>
+        `).join('');
     }
 
     async function adminAction(id, type) {
         const h = allHouses.find(x => x.id === id);
-        if(type === 'feat') await db.collection('houses').doc(id).update({featured: !h.featured});
-        if(type === 'ver') await db.collection('houses').doc(id).update({verified: !h.verified});
-        if(type === 'app') await db.collection('houses').doc(id).update({approved: !h.approved});
+        const update = {};
+        if(type === 'feat') update.featured = !h.featured;
+        if(type === 'ver') update.verified = !h.verified;
+        if(type === 'app') update.approved = !h.approved;
+        await db.collection('houses').doc(id).update(update);
     }
 
-    function adminDelHouse(id) { if(confirm("Delete this listing?")) db.collection('houses').doc(id).delete(); }
-    function adminDelUser(id) { if(confirm("Delete this user?")) db.collection('users').doc(id).delete(); }
+    function toggleLike(id) {
+        likedHouses.includes(id) ? likedHouses = likedHouses.filter(i => i !== id) : likedHouses.push(id);
+        localStorage.setItem('keja_liked', JSON.stringify(likedHouses));
+        renderMarket(); renderLikes();
+    }
 
-    function handleAuth() {
+    function renderLikes() {
+        const list = document.getElementById('likes-list'); list.innerHTML = "";
+        allHouses.filter(h => likedHouses.includes(h.id)).forEach(h => {
+            list.innerHTML += `<div class="h-card" onclick="viewHouse('${h.id}')"><div class="img-stack"><img src="${h.images?.[0] || ''}"></div><div style="padding:15px;"><b>Ksh ${h.price}</b><h4>${h.name}</h4></div></div>`;
+        });
+    }
+
+    function adminDelHouse(id) { if(confirm("Delete Listing?")) db.collection('houses').doc(id).delete(); }
+    function adminDelUser(id) { if(confirm("Delete User?")) db.collection('users').doc(id).delete(); }
+    function togglePassVisibility() { const p = document.getElementById('auth-pass'); p.type = p.type === "password" ? "text" : "password"; }
+    
+    function toggleAuthMode() { 
+        const f = document.getElementById('registration-fields'), t = document.getElementById('toggle-text'), b = document.getElementById('auth-btn');
+        f.style.display = f.style.display === 'none' ? 'block' : 'none';
+        t.innerText = f.style.display === 'none' ? 'Create New Account' : 'Sign In Instead';
+        b.innerText = f.style.display === 'none' ? 'Sign In' : 'Create Account';
+    }
+
+    async function handleAuth() {
         const e = document.getElementById('auth-email').value, p = document.getElementById('auth-pass').value;
         document.getElementById('loader').style.display = 'flex';
-        if(document.getElementById('registration-fields').style.display === 'block') {
-            auth.createUserWithEmailAndPassword(e, p).then(u => {
-                db.collection('users').doc(u.user.uid).set({ email: e, role: document.getElementById('auth-role').value });
-            }).catch(err => { alert(err.message); document.getElementById('loader').style.display = 'none'; });
-        } else {
-            auth.signInWithEmailAndPassword(e, p).catch(err => { alert(err.message); document.getElementById('loader').style.display = 'none'; });
-        }
+        try {
+            if(document.getElementById('registration-fields').style.display === 'block') {
+                const u = await auth.createUserWithEmailAndPassword(e, p);
+                await db.collection('users').doc(u.user.uid).set({ email: e, role: document.getElementById('auth-role').value });
+            } else { await auth.signInWithEmailAndPassword(e, p); }
+        } catch(err) { alert(err.message); document.getElementById('loader').style.display = 'none'; }
     }
 
     function resetPassword() { const e = document.getElementById('auth-email').value; if(e) auth.sendPasswordResetEmail(e).then(() => alert("Reset link sent!")); }
-    function togglePassVisibility() { const p = document.getElementById('auth-pass'); p.type = p.type === "password" ? "text" : "password"; }
-    function toggleAuthMode() { 
-        const f = document.getElementById('registration-fields'), t = document.getElementById('toggle-text');
-        f.style.display = f.style.display === 'none' ? 'block' : 'none';
-        t.innerText = f.style.display === 'none' ? 'Create New Account' : 'Sign In Instead';
+    
+    function switchView(id) {
+        document.querySelectorAll('.view-pane').forEach(v => v.style.display = 'none');
+        document.getElementById('view-'+id).style.display = 'block';
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        if(document.getElementById('tab-'+id)) document.getElementById('tab-'+id).classList.add('active');
     }
-    function switchView(id) { 
-        document.querySelectorAll('.view-pane').forEach(v => v.style.display = 'none'); 
-        document.getElementById('view-'+id).style.display = 'block'; 
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active')); 
-        if(document.getElementById('tab-'+id)) document.getElementById('tab-'+id).classList.add('active'); 
-    }
+
     function closeModal() { document.getElementById('houseModal').style.display = 'none'; }
     function requestPromotion() { window.open(`https://wa.me/254720680769?text=I want to promote my hostel to Hot Deals`); }
 </script>
