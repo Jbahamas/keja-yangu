@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Keja Yangu | MUT Student Housing</title>
+    
+    <title>Keja-yangu.co.ke | Keja Yangu Murang'a Student Housing</title>
+    <meta name="description" content="Keja Yangu Murang'a - The leading student housing portal for MUT students. Find affordable hostels in Murang'a on Keja-yangu.co.ke.">
+    <meta name="keywords" content="Keja yangu Murang'a, Keja-yangu.co.ke, MUT hostels, Murang'a University student housing, Keja Yangu, Jonah Gathu">
+    <meta name="author" content="Jonah Gathu">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -16,6 +21,7 @@
             --slate: #64748b;
         }
         body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: #334155; margin: 0; padding-bottom: 90px; }
+        
         #loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 5000; align-items: center; justify-content: center; flex-direction: column; }
         .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--gold); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -23,36 +29,53 @@
         .admin-list-item { background: white; padding: 12px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
         .action-btns { display: flex; gap: 5px; }
         .action-btns button { border: none; padding: 8px; border-radius: 6px; cursor: pointer; color: white; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; }
+
         .badge-full { background: var(--red); color: white; padding: 3px 8px; border-radius: 5px; font-size: 0.65rem; font-weight: bold; position: absolute; top: 10px; left: 10px; z-index: 10; }
+
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 4000; overflow-y: auto; }
         .modal-content { background: white; max-width: 450px; margin: 15px auto; padding: 20px; border-radius: 20px; color: #334155; position: relative; }
         .img-scroll-container { display: flex; overflow-x: auto; gap: 10px; scroll-snap-type: x mandatory; margin-top: 10px; scrollbar-width: none; }
         .img-scroll-container img { width: 90%; flex-shrink: 0; border-radius: 12px; height: 260px; object-fit: cover; }
+
         .app-bar { background: var(--white); padding: 15px 20px; border-bottom: 3px solid var(--gold); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        .logo-box { font-weight: 900; letter-spacing: -0.5px; font-size: 1.1rem; color: var(--navy); display: flex; align-items: center; gap: 8px; }
+
         .container { max-width: 500px; margin: 0 auto; padding: 15px; }
         .view-pane { display: none; animation: fadeIn 0.3s ease-in; }
+
         .card { background: var(--white); padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #e2e8f0; }
         input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1.5px solid #cbd5e1; border-radius: 12px; box-sizing: border-box; }
+        
         .btn-gold { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: 800; background: linear-gradient(135deg, var(--gold), var(--gold-hover)); color: var(--white); cursor: pointer; }
         .btn-outline { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid var(--navy); font-weight: 800; background: transparent; margin-top: 8px; cursor: pointer; }
+
         .h-card { background: var(--white); border-radius: 20px; overflow: hidden; margin-bottom: 25px; border: 1px solid #e2e8f0; position: relative; cursor: pointer; }
         .img-stack { height: 210px; background: #e2e8f0; overflow: hidden; }
         .img-stack img { width: 100%; height: 100%; object-fit: cover; }
+
         .like-btn { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.9); border: none; width: 35px; height: 35px; border-radius: 50%; color: #94a3b8; cursor: pointer; z-index: 15; transition: 0.2s; }
         .like-btn.active { color: var(--red); }
+
         .nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--white); display: none; justify-content: space-around; padding: 12px 0; border-top: 1px solid #e2e8f0; z-index: 1000; }
         .nav-tab { background: none; border: none; color: #94a3b8; font-size: 0.65rem; font-weight: 600; text-align: center; }
         .nav-tab.active { color: var(--blue); }
+
+        .jonah-brand { text-align: center; font-size: 0.75rem; color: #94a3b8; margin-top: 25px; letter-spacing: 0.5px; }
+        .jonah-brand b { color: var(--navy); }
+
+        /* Support Button Styling */
+        .support-fab { position: fixed; bottom: 85px; right: 20px; background: #25d366; color: white; width: 50px; height: 50px; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 3000; cursor: pointer; text-decoration: none; }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* New Credit Styling */
-        .dev-credit { text-align: center; font-size: 0.7rem; color: #94a3b8; margin-top: 20px; letter-spacing: 1px; text-transform: uppercase; }
-        .dev-credit b { color: var(--navy); }
     </style>
 </head>
 <body>
 
 <div id="loader"><div class="spinner"></div><p style="margin-top:10px; font-weight:bold;">Processing...</p></div>
+
+<a id="support-btn" href="https://wa.me/254720680769" target="_blank" class="support-fab">
+    <i class="fab fa-whatsapp"></i>
+</a>
 
 <div id="houseModal" class="modal" onclick="closeModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
@@ -75,14 +98,15 @@
 </div>
 
 <header class="app-bar">
-    <div class="logo-box"><img src="https://i.ibb.co/3mKNG8nV/House-logo.png" alt="Logo" width="32"> KEJA YANGU</div>
+    <div class="logo-box"><img src="https://i.ibb.co/3mKNG8nV/House-logo.png" alt="Logo" width="32"> KEJA-YANGU.CO.KE</div>
     <button onclick="auth.signOut()" id="logout-btn" style="display:none; background:#fee2e2; border:none; color:red; padding:6px 12px; border-radius:8px; font-weight:bold; cursor:pointer;">Logout</button>
 </header>
 
 <div class="container">
     <section id="view-auth" class="view-pane" style="display: block;">
         <div class="card">
-            <h2 style="margin-top:0;">Student Housing Portal</h2>
+            <h2 style="margin-top:0;">Keja-yangu Murang'a</h2>
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 15px;">Official Housing Portal for Murang'a University Students</p>
             <input type="email" id="auth-email" placeholder="Email Address">
             <input type="password" id="auth-pass" placeholder="Password">
             <div id="registration-fields" style="display:none;">
@@ -96,11 +120,11 @@
             <div style="margin-top:20px; font-size:0.75rem; color:#475569; border-top:1px solid #e2e8f0; padding-top:15px;">
                 <b style="color:var(--navy);">Terms of Use:</b>
                 <ul style="padding-left:15px; margin:5px 0;">
-                    <li>Keja Yangu is an independent directory. Verify room status physically.</li>
-                    <li>No payments should be made before viewing and signing a lease.</li>
+                    <li>Keja-yangu.co.ke is the digital home of Keja Yangu Murang'a.</li>
+                    <li>Always verify room status physically before making any payments.</li>
                 </ul>
             </div>
-            <div class="dev-credit">Developed by <b>Your Name</b></div>
+            <div class="jonah-brand">Developed by <b>Jonah Gathu</b></div>
         </div>
     </section>
 
@@ -109,7 +133,7 @@
             <h4 style="margin-bottom:10px; color:var(--gold);"><i class="fas fa-crown"></i> Hot Deals</h4>
             <div style="display: flex; overflow-x: auto; gap: 15px; padding-bottom: 15px; scrollbar-width: none;" id="featured-list"></div>
         </div>
-        <input type="text" id="search-input" placeholder="🔍 Search hostel name..." onkeyup="renderMarket()" style="margin-bottom:15px;">
+        <input type="text" id="search-input" placeholder="🔍 Search Keja Yangu Murang'a listings..." onkeyup="renderMarket()" style="margin-bottom:15px;">
         <div id="market-list"></div>
     </section>
 
@@ -134,7 +158,7 @@
         <div id="admin-houses-list"></div>
         <h4 style="margin-top:20px;">Platform Users</h4>
         <div id="admin-members-list"></div>
-        <div class="dev-credit" style="margin-top:40px;">System Engine v1.0 | Developed by <b>Your Name</b></div>
+        <div class="jonah-brand" style="margin-top:50px;">Platform Engine v1.2 | Developed by <b>Jonah Gathu</b></div>
     </section>
 </div>
 
@@ -146,7 +170,6 @@
 </nav>
 
 <script>
-    // ... Script section remains exactly same as previous ...
     const firebaseConfig = {
         apiKey: "AIzaSyCC8SA7FKzikzHwvA9A6dyrv0x2jguyPPQ",
         authDomain: "murang-a-student-housing.firebaseapp.com",
@@ -158,6 +181,7 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth(), db = firebase.firestore();
     const ADMIN_EMAIL = "jonahnjugi100@gmail.com";
+
     let allHouses = [], allUsers = [], likedHouses = JSON.parse(localStorage.getItem('keja_liked') || '[]');
 
     auth.onAuthStateChanged(async user => {
@@ -165,18 +189,18 @@
         if(user) {
             document.getElementById('logout-btn').style.display = 'block';
             document.getElementById('main-nav').style.display = 'flex';
+            document.getElementById('support-btn').style.display = 'flex';
             const userDoc = await db.collection('users').doc(user.uid).get();
-            const role = userDoc.data()?.role;
             if(user.email === ADMIN_EMAIL) {
                 document.getElementById('nav-admin').style.display = 'block';
                 document.getElementById('nav-landlord').style.display = 'block';
                 db.collection('users').onSnapshot(snap => { allUsers = snap.docs.map(d=>({id:d.id, ...d.data()})); renderAdminMembers(); });
             } else {
                 document.getElementById('nav-admin').style.display = 'none';
-                document.getElementById('nav-landlord').style.display = (role === 'landlord') ? 'block' : 'none';
+                document.getElementById('nav-landlord').style.display = (userDoc.data()?.role === 'landlord') ? 'block' : 'none';
             }
             switchView('student'); loadData();
-        } else { switchView('auth'); document.getElementById('main-nav').style.display = 'none'; }
+        } else { switchView('auth'); document.getElementById('main-nav').style.display = 'none'; document.getElementById('support-btn').style.display = 'none'; }
     });
 
     function loadData() {
@@ -234,7 +258,7 @@
     async function saveNewHostel() {
         const imgs = document.getElementById('post-images').value.split('\n').filter(i => i.trim());
         await db.collection('houses').add({ name: document.getElementById('post-name').value, price: document.getElementById('post-price').value, dist_meters: document.getElementById('post-dist-val').value, phone: document.getElementById('post-phone').value, amenities: document.getElementById('post-amenities').value, images: imgs, approved: false, verified: false, featured: false, isOccupied: false, ownerId: auth.currentUser.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-        alert("Submitted!"); switchView('student');
+        alert("Listing Submitted!"); switchView('student');
     }
 
     function renderAdminProperties() {
@@ -249,12 +273,12 @@
         if(type === 'app') await db.collection('houses').doc(id).update({approved: !h.approved});
     }
 
-    function adminDelHouse(id) { if(confirm("Delete?")) db.collection('houses').doc(id).delete(); }
+    function adminDelHouse(id) { if(confirm("Delete this listing?")) db.collection('houses').doc(id).delete(); }
     function renderAdminMembers() {
         const list = document.getElementById('admin-members-list'); list.innerHTML = "";
         allUsers.forEach(u => { if(u.email !== ADMIN_EMAIL) list.innerHTML += `<div class="admin-list-item"><div><b>${u.email}</b><br><small>${u.role}</small></div><button onclick="adminDelUser('${u.id}')" style="background:none; border:none; color:red;"><i class="fas fa-user-minus"></i></button></div>`; });
     }
-    function adminDelUser(id) { if(confirm("Delete User?")) db.collection('users').doc(id).delete(); }
+    function adminDelUser(id) { if(confirm("Delete this User?")) db.collection('users').doc(id).delete(); }
     function handleAuth() {
         const e = document.getElementById('auth-email').value, p = document.getElementById('auth-pass').value;
         if(!e || !p) return alert("Fill all fields");
@@ -267,7 +291,7 @@
     function switchView(id) { document.querySelectorAll('.view-pane').forEach(v => v.style.display = 'none'); document.getElementById('view-'+id).style.display = 'block'; document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active')); if(document.getElementById('tab-'+id)) document.getElementById('tab-'+id).classList.add('active'); }
     function closeModal() { document.getElementById('houseModal').style.display = 'none'; }
     function renderLikes() { const list = document.getElementById('likes-list'); list.innerHTML = ""; allHouses.filter(h => likedHouses.includes(h.id)).forEach(h => { list.innerHTML += `<div class="h-card" onclick="viewHouse('${h.id}')"><div class="img-stack"><img src="${h.images?.[0] || ''}"></div><div style="padding:15px;"><b>Ksh ${h.price}</b><h4>${h.name}</h4></div></div>`; }); }
-    function resetPassword() { const e = document.getElementById('auth-email').value; if(e) auth.sendPasswordResetEmail(e).then(() => alert("Sent!")); }
+    function resetPassword() { const e = document.getElementById('auth-email').value; if(e) auth.sendPasswordResetEmail(e).then(() => alert("Email sent!")); }
 </script>
 </body>
 </html>
