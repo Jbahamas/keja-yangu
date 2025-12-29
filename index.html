@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Keja Yangu Murang'a | Student Housing Portal</title>
     
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#d4af37">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -70,7 +72,6 @@
 
         .support-fab { position: fixed; bottom: 85px; right: 20px; background: #25d366; color: white; width: 50px; height: 50px; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 3000; cursor: pointer; text-decoration: none; }
         
-        /* Filter Styles */
         .filter-row { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; scrollbar-width: none; padding-bottom: 5px; }
         .filter-row select { flex: 1; min-width: 100px; margin: 0; padding: 10px; font-size: 13px; background: var(--white); border-color: #e2e8f0; }
 
@@ -93,10 +94,11 @@
             <span id="modalTypeInfo" style="font-size: 0.85rem; color: var(--slate); font-weight: bold;"></span>
             <p id="modalAmenities" style="font-size:0.9rem; margin-top:10px;"></p>
         </div>
-        <div id="modalContactArea">
-            <button id="modalChat" class="btn-gold"><i class="fab fa-whatsapp"></i> WhatsApp Landlord</button>
-            <button id="modalCall" class="btn-outline"><i class="fas fa-phone"></i> Call Landlord</button>
+        <div id="modalContactArea" style="display:flex; gap:10px;">
+            <button id="modalChat" class="btn-gold"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+            <button id="modalCall" class="btn-outline" style="margin-top:10px;"><i class="fas fa-phone"></i> Call</button>
         </div>
+        <button class="btn-outline" onclick="shareHostel()" style="border-color:var(--gold); color:var(--gold);"><i class="fas fa-share-alt"></i> Share with Friends</button>
     </div>
 </div>
 
@@ -167,6 +169,7 @@
         </div>
 
         <div id="market-list"></div>
+        <button class="btn-outline" onclick="requestFeature()" style="margin-top:30px; border-style:dotted;">Request a Feature</button>
     </section>
 
     <section id="view-likes" class="view-pane">
@@ -203,6 +206,20 @@
         <div id="landlord-listings"></div>
     </section>
 
+    <section id="view-settings" class="view-pane">
+        <div class="card">
+            <h3>Account Settings</h3>
+            <p>Email: <b id="settings-email"></b></p>
+            <button class="btn-outline" onclick="resetPassword()" style="color:var(--blue); border-color:var(--blue);">Reset Password</button>
+            <button class="btn-outline" onclick="deleteMyAccount()" style="color:var(--red); border-color:var(--red); margin-top:20px;">Delete Account</button>
+        </div>
+        <div class="card">
+            <h4>Support</h4>
+            <p style="font-size:0.9rem;">Facing issues? Contact Jonah Gathu directly.</p>
+            <button class="btn-gold" onclick="window.open('https://wa.me/254720680769')"><i class="fab fa-whatsapp"></i> Chat Developer</button>
+        </div>
+    </section>
+
     <section id="view-admin" class="view-pane">
         <h3 style="color:var(--red);">🛡️ Admin Panel</h3>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
@@ -224,6 +241,7 @@
     <button class="nav-tab active" id="tab-student" onclick="switchView('student')"><i class="fas fa-search"></i><br>Explore</button>
     <button class="nav-tab" id="tab-likes" onclick="switchView('likes')"><i class="fas fa-heart"></i><br>Saved</button>
     <button id="nav-landlord-tab" class="nav-tab" onclick="switchView('landlord')" style="display:none;"><i class="fas fa-plus"></i><br>My Keja</button>
+    <button class="nav-tab" id="tab-settings" onclick="switchView('settings')"><i class="fas fa-cog"></i><br>Settings</button>
     <button id="nav-admin-tab" class="nav-tab" onclick="switchView('admin')" style="display:none; color:red;"><i class="fas fa-chart-line"></i><br>Admin</button>
 </nav>
 
@@ -280,6 +298,8 @@
             document.getElementById('logout-btn').style.display = 'block';
             document.getElementById('main-nav').style.display = 'flex';
             document.getElementById('support-btn').style.display = 'flex';
+            document.getElementById('settings-email').innerText = user.email;
+            
             const userDoc = await db.collection('users').doc(user.uid).get();
             const role = user.email === ADMIN_EMAIL ? 'admin' : (userDoc.exists ? userDoc.data().role : 'student');
             
@@ -365,6 +385,11 @@
         document.getElementById('houseModal').style.display = 'block';
     }
 
+    function shareHostel() {
+        const title = document.getElementById('modalTitle').innerText;
+        navigator.share({ title: 'Keja Yangu', text: `Check out ${title} hostel in Murang'a!`, url: window.location.href });
+    }
+
     async function saveNewHostel() {
         const name = document.getElementById('post-name').value;
         const price = document.getElementById('post-price').value;
@@ -411,7 +436,6 @@
     // ADMIN DATA RENDERING
     function renderAdminData() {
         const userQ = document.getElementById('admin-user-search').value.toLowerCase();
-        
         document.getElementById('stat-houses').innerText = allHouses.length;
         document.getElementById('stat-earnings').innerText = (allHouses.filter(h => h.featured).length * FEATURE_PRICE).toLocaleString();
         document.getElementById('stat-users').innerText = allUsers.length;
@@ -473,6 +497,7 @@
 
     async function handleAuth() {
         const e = document.getElementById('auth-email').value, p = document.getElementById('auth-pass').value;
+        if(!e || !p) return alert("Fill fields");
         document.getElementById('loader').style.display = 'flex';
         try {
             if(document.getElementById('registration-fields').style.display === 'block') {
@@ -482,8 +507,15 @@
         } catch(err) { alert(err.message); document.getElementById('loader').style.display = 'none'; }
     }
 
-    function resetPassword() { const e = document.getElementById('auth-email').value; if(e) auth.sendPasswordResetEmail(e).then(() => alert("Reset link sent!")); }
+    function resetPassword() { const e = document.getElementById('auth-email').value || auth.currentUser?.email; if(e) auth.sendPasswordResetEmail(e).then(() => alert("Reset link sent!")); }
     
+    async function deleteMyAccount() {
+        if(confirm("Are you sure? This will delete all your data forever.")) {
+            await db.collection('users').doc(auth.currentUser.uid).delete();
+            auth.currentUser.delete().then(() => location.reload());
+        }
+    }
+
     function switchView(id) {
         document.querySelectorAll('.view-pane').forEach(v => v.style.display = 'none');
         document.getElementById('view-'+id).style.display = 'block';
@@ -493,6 +525,12 @@
 
     function closeModal() { document.getElementById('houseModal').style.display = 'none'; }
     function requestPromotion() { window.open(`https://wa.me/254720680769?text=I want to promote my hostel to Hot Deals`); }
+    function requestFeature() { const f = prompt("What feature should Jonah add next?"); if(f) alert("Request sent!"); }
+
+    // SERVICE WORKER REGISTRATION
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+    }
 </script>
 </body>
 </html>
