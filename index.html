@@ -31,6 +31,9 @@
         .app-bar { background: var(--white); padding: 15px 20px; border-bottom: 3px solid var(--gold); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
         .logo-box { font-weight: 900; font-size: 1.1rem; color: var(--navy); display: flex; align-items: center; gap: 8px; }
 
+        /* Install Button Styling */
+        #install-pwa { display: none; background: var(--gold); border: none; color: white; padding: 6px 12px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; cursor: pointer; margin-right: 5px; }
+
         .container { max-width: 500px; margin: 0 auto; padding: 15px; }
         .view-pane { display: none; animation: fadeIn 0.3s ease-in; }
 
@@ -103,8 +106,11 @@
 </div>
 
 <header class="app-bar">
-    <div class="logo-box"><img src="https://i.ibb.co/3mKNG8nV/House-logo.png" alt="Logo" width="30"> Keja Yangu Murang'a</div>
-    <button onclick="auth.signOut()" id="logout-btn" style="display:none; background:#fee2e2; border:none; color:red; padding:6px 12px; border-radius:8px; font-weight:bold;">Logout</button>
+    <div class="logo-box"><img src="https://i.ibb.co/3mKNG8nV/House-logo.png" alt="Logo" width="30"> Keja Yangu</div>
+    <div style="display: flex; align-items: center;">
+        <button id="install-pwa" onclick="installApp()"><i class="fas fa-download"></i> Install</button>
+        <button onclick="auth.signOut()" id="logout-btn" style="display:none; background:#fee2e2; border:none; color:red; padding:6px 12px; border-radius:8px; font-weight:bold;">Logout</button>
+    </div>
 </header>
 
 <div class="container">
@@ -256,6 +262,34 @@
     };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth(), db = firebase.firestore();
+    
+    // PWA INSTALLATION LOGIC
+    let deferredPrompt;
+    const installBtn = document.getElementById('install-pwa');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installBtn.style.display = 'block'; // Show install button when app is ready to be installed
+    });
+
+    async function installApp() {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            installBtn.style.display = 'none';
+        }
+        deferredPrompt = null;
+    }
+
+    // Hide install button if already installed
+    window.addEventListener('appinstalled', () => {
+        installBtn.style.display = 'none';
+        deferredPrompt = null;
+    });
+
+    // REST OF YOUR SCRIPTS (No changes needed below this line)
     const ADMIN_EMAIL = "jonahnjugi100@gmail.com";
     const FEATURE_PRICE = 500; 
     let allHouses = [], allUsers = [], likedHouses = JSON.parse(localStorage.getItem('keja_liked') || '[]');
@@ -291,7 +325,6 @@
         renderUploadPreviews();
     }
 
-    // AUTH OBSERVER
     auth.onAuthStateChanged(async user => {
         document.getElementById('loader').style.display = 'none';
         if(user) {
@@ -329,7 +362,6 @@
         });
     }
 
-    // MARKETPLACE RENDERING
     function renderMarket() {
         const mList = document.getElementById('market-list'), fList = document.getElementById('featured-list'), pSec = document.getElementById('premium-section');
         const q = document.getElementById('search-input').value.toLowerCase();
@@ -433,7 +465,6 @@
         await db.collection('houses').doc(id).update({isVacant: !(h.isVacant !== false)});
     }
 
-    // ADMIN DATA RENDERING
     function renderAdminData() {
         const userQ = document.getElementById('admin-user-search').value.toLowerCase();
         document.getElementById('stat-houses').innerText = allHouses.length;
@@ -527,7 +558,6 @@
     function requestPromotion() { window.open(`https://wa.me/254720680769?text=I want to promote my hostel to Hot Deals`); }
     function requestFeature() { const f = prompt("What feature should Jonah add next?"); if(f) alert("Request sent!"); }
 
-    // SERVICE WORKER REGISTRATION
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js');
     }
