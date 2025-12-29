@@ -1,0 +1,16 @@
+{
+  "name": "Keja Yangu Murang'a",
+  "short_name": "Keja Yangu",
+  "description": "Student Housing Portal for Murang'a University Students",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#d4af37",
+  "icons": [
+    {
+      "src": "https://i.ibb.co/3mKNG8nV/House-logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
