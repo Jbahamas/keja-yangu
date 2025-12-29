@@ -31,7 +31,6 @@
         .app-bar { background: var(--white); padding: 15px 20px; border-bottom: 3px solid var(--gold); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
         .logo-box { font-weight: 900; font-size: 1.1rem; color: var(--navy); display: flex; align-items: center; gap: 8px; }
 
-        /* Install Button Styling */
         #install-pwa { display: none; background: var(--gold); border: none; color: white; padding: 6px 12px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; cursor: pointer; margin-right: 5px; }
 
         .container { max-width: 500px; margin: 0 auto; padding: 15px; }
@@ -78,12 +77,16 @@
         .filter-row { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; scrollbar-width: none; padding-bottom: 5px; }
         .filter-row select { flex: 1; min-width: 100px; margin: 0; padding: 10px; font-size: 13px; background: var(--white); border-color: #e2e8f0; }
 
+        #refresh-indicator { display: none; text-align: center; padding: 10px; background: var(--white); color: var(--gold); font-weight: bold; position: fixed; top: 60px; left: 0; right: 0; z-index: 900; border-bottom: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <div id="loader"><div class="spinner"></div><p style="margin-top:10px; font-weight:bold;">Keja Yangu is Loading...</p></div>
+
+<div id="refresh-indicator"><i class="fas fa-sync fa-spin"></i> Updating listings...</div>
 
 <a id="support-btn" href="https://wa.me/254720680769" target="_blank" class="support-fab"><i class="fab fa-whatsapp"></i></a>
 
@@ -262,38 +265,43 @@
     };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth(), db = firebase.firestore();
-    
-    // PWA INSTALLATION LOGIC
-    let deferredPrompt;
-    const installBtn = document.getElementById('install-pwa');
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        installBtn.style.display = 'block'; // Show install button when app is ready to be installed
-    });
-
-    async function installApp() {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-            installBtn.style.display = 'none';
-        }
-        deferredPrompt = null;
-    }
-
-    // Hide install button if already installed
-    window.addEventListener('appinstalled', () => {
-        installBtn.style.display = 'none';
-        deferredPrompt = null;
-    });
-
-    // REST OF YOUR SCRIPTS (No changes needed below this line)
     const ADMIN_EMAIL = "jonahnjugi100@gmail.com";
     const FEATURE_PRICE = 500; 
     let allHouses = [], allUsers = [], likedHouses = JSON.parse(localStorage.getItem('keja_liked') || '[]');
     let currentUploads = [];
+
+    // PULL TO REFRESH LOGIC
+    let touchStart = 0;
+    window.addEventListener('touchstart', (e) => { touchStart = e.targetTouches[0].pageY; }, { passive: true });
+    window.addEventListener('touchmove', (e) => {
+        let touchMove = e.targetTouches[0].pageY;
+        if (window.scrollY === 0 && (touchMove - touchStart) > 150) {
+            const indicator = document.getElementById('refresh-indicator');
+            if(indicator.style.display === 'none' || indicator.style.display === '') {
+                indicator.style.display = 'block';
+                loadData();
+                setTimeout(() => { indicator.style.display = 'none'; }, 1500);
+            }
+        }
+    }, { passive: true });
+
+    // PWA INSTALLATION LOGIC
+    let deferredPrompt;
+    const installBtn = document.getElementById('install-pwa');
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installBtn.style.display = 'block';
+    });
+    async function installApp() {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') installBtn.style.display = 'none';
+        deferredPrompt = null;
+    }
+    window.addEventListener('appinstalled', () => { installBtn.style.display = 'none'; });
 
     // CLOUDINARY LOGIC
     function openUploadWidget() {
@@ -368,7 +376,6 @@
         const typeFilter = document.getElementById('filter-type').value;
         const priceFilter = document.getElementById('filter-price').value;
         const distFilter = document.getElementById('filter-dist').value;
-
         mList.innerHTML = ""; fList.innerHTML = "";
         
         const filtered = allHouses.filter(h => {
@@ -377,7 +384,6 @@
             const matchesPrice = priceFilter === "all" || parseInt(h.price) <= parseInt(priceFilter);
             const matchesDist = distFilter === "all" || parseInt(h.dist_meters) <= parseInt(distFilter);
             const isVisible = h.approved && h.isVacant !== false;
-            
             return matchesSearch && matchesType && matchesPrice && matchesDist && isVisible;
         });
 
@@ -426,22 +432,16 @@
         const name = document.getElementById('post-name').value;
         const price = document.getElementById('post-price').value;
         const houseType = document.getElementById('post-type').value;
-
         if(!name || !price || !houseType || currentUploads.length === 0) return alert("Please fill all details and upload photos.");
-
         await db.collection('houses').add({ 
-            name, 
-            price: parseInt(price), 
-            houseType,
+            name, price: parseInt(price), houseType,
             dist_meters: parseInt(document.getElementById('post-dist-val').value), 
             phone: document.getElementById('post-phone').value, 
             amenities: document.getElementById('post-amenities').value, 
-            images: currentUploads, 
-            ownerId: auth.currentUser.uid, 
+            images: currentUploads, ownerId: auth.currentUser.uid, 
             featured: false, approved: false, verified: false, isVacant: true, 
             createdAt: firebase.firestore.FieldValue.serverTimestamp() 
         });
-
         window.open(`https://wa.me/254720680769?text=Listed New Hostel: *${name}*`);
         currentUploads = []; document.getElementById('upload-preview').innerHTML = "";
         alert("Published! Admin will review shortly."); switchView('student');
@@ -470,16 +470,13 @@
         document.getElementById('stat-houses').innerText = allHouses.length;
         document.getElementById('stat-earnings').innerText = (allHouses.filter(h => h.featured).length * FEATURE_PRICE).toLocaleString();
         document.getElementById('stat-users').innerText = allUsers.length;
-        
         const filteredUsers = allUsers.filter(u => (u.email || "").toLowerCase().includes(userQ));
-
         document.getElementById('admin-members-list').innerHTML = filteredUsers.map(u => `
             <div class="admin-list-item">
                 <div><b>${u.email}</b><br><small>${u.role}</small></div>
                 <button onclick="adminDelUser('${u.id}')" style="color:red; background:none; border:none;"><i class="fas fa-user-minus"></i></button>
             </div>
         `).join('');
-
         document.getElementById('admin-houses-list').innerHTML = allHouses.map(h => `
             <div class="admin-list-item">
                 <div><b>${h.name}</b></div>
@@ -541,25 +538,31 @@
     function resetPassword() { const e = document.getElementById('auth-email').value || auth.currentUser?.email; if(e) auth.sendPasswordResetEmail(e).then(() => alert("Reset link sent!")); }
     
     async function deleteMyAccount() {
-        if(confirm("Are you sure? This will delete all your data forever.")) {
-            await db.collection('users').doc(auth.currentUser.uid).delete();
-            auth.currentUser.delete().then(() => location.reload());
+        if(confirm("Are you sure? This will delete all your data permanently.")) {
+            try {
+                const user = auth.currentUser;
+                await db.collection('users').doc(user.uid).delete();
+                await user.delete();
+                alert("Account deleted.");
+            } catch(err) { alert("Please logout and login again to verify identity before deletion."); }
         }
     }
 
-    function switchView(id) {
-        document.querySelectorAll('.view-pane').forEach(v => v.style.display = 'none');
-        document.getElementById('view-'+id).style.display = 'block';
+    function switchView(v) {
+        document.querySelectorAll('.view-pane').forEach(p => p.style.display = 'none');
         document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        if(document.getElementById('tab-'+id)) document.getElementById('tab-'+id).classList.add('active');
+        document.getElementById('view-'+v).style.display = 'block';
+        if(document.getElementById('tab-'+v)) document.getElementById('tab-'+v).classList.add('active');
+        window.scrollTo(0,0);
     }
-
     function closeModal() { document.getElementById('houseModal').style.display = 'none'; }
-    function requestPromotion() { window.open(`https://wa.me/254720680769?text=I want to promote my hostel to Hot Deals`); }
-    function requestFeature() { const f = prompt("What feature should Jonah add next?"); if(f) alert("Request sent!"); }
+    function requestPromotion() { window.open('https://wa.me/254720680769?text=I want to promote my Keja'); }
+    function requestFeature() { window.open('https://wa.me/254720680769?text=Feature Request:'); }
 
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js');
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').then(reg => console.log('SW Registered')).catch(err => console.log('SW Fail', err));
+        });
     }
 </script>
 </body>
