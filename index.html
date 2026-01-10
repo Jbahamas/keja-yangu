@@ -5,9 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Keja Yangu Murang'a | Student Housing Portal</title>
     
+    <link rel="canonical" href="https://murang-a-student-housing.web.app/">
+    <link rel="icon" type="image/png" href="https://i.ibb.co/3mKNG8nV/House-logo.png">
+    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#d4af37">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -28,8 +32,9 @@
         .pass-wrapper { position: relative; width: 100%; }
         .toggle-pass { position: absolute; right: 15px; top: 20px; cursor: pointer; color: var(--slate); }
 
-        .app-bar { background: var(--white); padding: 15px 20px; border-bottom: 3px solid var(--gold); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .logo-box { font-weight: 900; font-size: 1.1rem; color: var(--navy); display: flex; align-items: center; gap: 8px; }
+        .app-bar { background: var(--white); padding: 12px 20px; border-bottom: 3px solid var(--gold); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .logo-box { font-weight: 900; font-size: 1.2rem; color: var(--navy); display: flex; align-items: center; gap: 10px; }
+        .logo-box img { width: 32px; height: 32px; object-fit: contain; }
 
         #install-pwa { display: none; background: var(--gold); border: none; color: white; padding: 6px 12px; border-radius: 8px; font-weight: bold; font-size: 0.8rem; cursor: pointer; margin-right: 5px; }
 
@@ -79,7 +84,6 @@
 
         #refresh-indicator { display: none; text-align: center; padding: 10px; background: var(--white); color: var(--gold); font-weight: bold; position: fixed; top: 60px; left: 0; right: 0; z-index: 900; border-bottom: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
-        /* Roommate Styles */
         .roommate-card { background: white; border-radius: 15px; padding: 15px; margin-bottom: 15px; border: 1px solid #e2e8f0; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .roommate-card:hover { border-color: var(--gold); }
 
@@ -122,7 +126,10 @@
 </div>
 
 <header class="app-bar">
-    <div class="logo-box"><img src="https://i.ibb.co/3mKNG8nV/House-logo.png" alt="Logo" width="30"> Keja Yangu</div>
+    <div class="logo-box">
+        <img src="https://i.ibb.co/3mKNG8nV/House-logo.png" alt="Keja Yangu Logo">
+        <span>Keja Yangu</span>
+    </div>
     <div style="display: flex; align-items: center;">
         <button id="install-pwa" onclick="installApp()"><i class="fas fa-download"></i> Install</button>
         <button onclick="auth.signOut()" id="logout-btn" style="display:none; background:#fee2e2; border:none; color:red; padding:6px 12px; border-radius:8px; font-weight:bold;">Logout</button>
@@ -298,7 +305,7 @@
     let allHouses = [], allUsers = [], allRoommates = [], likedHouses = JSON.parse(localStorage.getItem('keja_liked') || '[]');
     let currentUploads = [];
 
-    // PULL TO REFRESH LOGIC
+    // PULL TO REFRESH
     let touchStart = 0;
     window.addEventListener('touchstart', (e) => { touchStart = e.targetTouches[0].pageY; }, { passive: true });
     window.addEventListener('touchmove', (e) => {
@@ -313,7 +320,7 @@
         }
     }, { passive: true });
 
-    // PWA INSTALLATION LOGIC
+    // PWA
     let deferredPrompt;
     const installBtn = document.getElementById('install-pwa');
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -328,9 +335,8 @@
         if (outcome === 'accepted') installBtn.style.display = 'none';
         deferredPrompt = null;
     }
-    window.addEventListener('appinstalled', () => { installBtn.style.display = 'none'; });
 
-    // CLOUDINARY LOGIC
+    // CLOUDINARY
     function openUploadWidget() {
         cloudinary.openUploadWidget({
             cloudName: 'dtlpjxmf8', 
@@ -344,7 +350,6 @@
             }
         });
     }
-
     function renderUploadPreviews() {
         const container = document.getElementById('upload-preview');
         container.innerHTML = currentUploads.map((url, index) => `
@@ -354,12 +359,12 @@
             </div>
         `).join('');
     }
-
     function removeUploadedImg(index) {
         currentUploads.splice(index, 1);
         renderUploadPreviews();
     }
 
+    // AUTH OBSERVER
     auth.onAuthStateChanged(async user => {
         document.getElementById('loader').style.display = 'none';
         if(user) {
@@ -379,18 +384,18 @@
             }
             switchView('student'); 
             loadData();
-        } else { switchView('auth'); document.getElementById('main-nav').style.display = 'none'; }
+        } else { 
+            switchView('auth'); 
+            document.getElementById('main-nav').style.display = 'none'; 
+        }
     });
 
     function loadData() {
-        // Houses
         db.collection('houses').orderBy('createdAt', 'desc').onSnapshot(snap => {
             allHouses = snap.docs.map(d => ({id: d.id, ...d.data()}));
             renderMarket(); renderLikes(); renderLandlordPanel();
             if(auth.currentUser?.email === ADMIN_EMAIL) fetchUsers();
         });
-
-        // Roommates
         db.collection('roommates').orderBy('createdAt', 'desc').onSnapshot(snap => {
             allRoommates = snap.docs.map(d => ({id: d.id, ...d.data()}));
             renderRoommates();
@@ -404,47 +409,38 @@
         });
     }
 
-    // --- ROOMMATE LOGIC ---
+    // ROOMMATES
     async function saveRoommateRequest() {
         const name = document.getElementById('rm-input-name').value;
         const phone = document.getElementById('rm-input-phone').value;
         const details = document.getElementById('rm-input-details').value;
-
         if(!name || !phone || !details) return alert("Please fill all fields.");
-
         await db.collection('roommates').add({
             name, phone, details,
             userId: auth.currentUser.uid,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-
         document.getElementById('rm-input-name').value = "";
         document.getElementById('rm-input-phone').value = "";
         document.getElementById('rm-input-details').value = "";
         alert("Your request is live!");
     }
-
     function renderRoommates() {
         const list = document.getElementById('roommates-list');
         list.innerHTML = "<h4>Active Requests</h4>";
         if(allRoommates.length === 0) list.innerHTML += "<p style='font-size:0.8rem; color:var(--slate);'>No requests yet. Be the first!</p>";
-        
         allRoommates.forEach(rm => {
             const card = document.createElement('div');
             card.className = "roommate-card";
             card.onclick = () => viewRoommateDetails(rm.id);
-            card.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <strong style="color:var(--navy); font-size:1.1rem;">${rm.name}</strong>
-                    <i class="fas fa-chevron-right" style="color:var(--gold);"></i>
-                </div>
-                <p style="font-size:0.85rem; color:var(--slate); margin:8px 0;">${rm.details.substring(0, 80)}...</p>
-                <small style="color:var(--blue); font-weight:bold;">Click to view & reply</small>
-            `;
+            card.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong style="color:var(--navy); font-size:1.1rem;">${rm.name}</strong>
+                <i class="fas fa-chevron-right" style="color:var(--gold);"></i>
+            </div><p style="font-size:0.85rem; color:var(--slate); margin:8px 0;">${rm.details.substring(0, 80)}...</p>
+            <small style="color:var(--blue); font-weight:bold;">Click to view & reply</small>`;
             list.appendChild(card);
         });
     }
-
     function viewRoommateDetails(id) {
         const rm = allRoommates.find(x => x.id === id);
         if(!rm) return;
@@ -453,12 +449,9 @@
         document.getElementById('rmWhatsApp').onclick = () => window.open(`https://wa.me/${rm.phone.replace(/^0/, '254')}?text=Hi ${rm.name}, I saw your roommate request on Keja Yangu!`);
         document.getElementById('roommateModal').style.display = 'block';
     }
+    function closeRoommateModal() { document.getElementById('roommateModal').style.display = 'none'; }
 
-    function closeRoommateModal() {
-        document.getElementById('roommateModal').style.display = 'none';
-    }
-    // --- END ROOMMATE LOGIC ---
-
+    // MARKET
     function renderMarket() {
         const mList = document.getElementById('market-list'), fList = document.getElementById('featured-list'), pSec = document.getElementById('premium-section');
         const q = document.getElementById('search-input').value.toLowerCase();
@@ -466,7 +459,6 @@
         const priceFilter = document.getElementById('filter-price').value;
         const distFilter = document.getElementById('filter-dist').value;
         mList.innerHTML = ""; fList.innerHTML = "";
-        
         const filtered = allHouses.filter(h => {
             const matchesSearch = (h.name || "").toLowerCase().includes(q);
             const matchesType = typeFilter === "all" || h.houseType === typeFilter;
@@ -475,10 +467,8 @@
             const isVisible = h.approved && h.isVacant !== false;
             return matchesSearch && matchesType && matchesPrice && matchesDist && isVisible;
         });
-
         const featured = filtered.filter(h => h.featured);
         const regular = filtered.filter(h => !h.featured);
-
         if(featured.length > 0) {
             pSec.style.display = 'block';
             featured.forEach(h => {
@@ -488,7 +478,6 @@
                 </div>`;
             });
         } else pSec.style.display = 'none';
-
         regular.forEach(h => {
             mList.innerHTML += `<div class="h-card" onclick="viewHouse('${h.id}')">
                 <button class="like-btn ${likedHouses.includes(h.id)?'active':''}" onclick="event.stopPropagation(); toggleLike('${h.id}')"><i class="fas fa-heart"></i></button>
@@ -498,7 +487,6 @@
             </div>`;
         });
     }
-
     function viewHouse(id) {
         const h = allHouses.find(x => x.id === id);
         if(!h) return;
@@ -511,12 +499,12 @@
         document.getElementById('modalCall').onclick = () => window.open(`tel:${h.phone}`);
         document.getElementById('houseModal').style.display = 'block';
     }
-
     function shareHostel() {
         const title = document.getElementById('modalTitle').innerText;
         navigator.share({ title: 'Keja Yangu', text: `Check out ${title} hostel in Murang'a!`, url: window.location.href });
     }
 
+    // LANDLORD/ADMIN
     async function saveNewHostel() {
         const name = document.getElementById('post-name').value;
         const price = document.getElementById('post-price').value;
@@ -535,7 +523,6 @@
         currentUploads = []; document.getElementById('upload-preview').innerHTML = "";
         alert("Published! Admin will review shortly."); switchView('student');
     }
-
     function renderLandlordPanel() {
         const list = document.getElementById('landlord-listings'); list.innerHTML = "";
         allHouses.filter(h => h.ownerId === auth.currentUser?.uid).forEach(h => {
@@ -548,12 +535,10 @@
             </div>`;
         });
     }
-
     async function toggleOccupancy(id) {
         const h = allHouses.find(x => x.id === id);
         await db.collection('houses').doc(id).update({isVacant: !(h.isVacant !== false)});
     }
-
     function renderAdminData() {
         const userQ = document.getElementById('admin-user-search').value.toLowerCase();
         document.getElementById('stat-houses').innerText = allHouses.length;
@@ -564,8 +549,7 @@
             <div class="admin-list-item">
                 <div><b>${u.email}</b><br><small>${u.role}</small></div>
                 <button onclick="adminDelUser('${u.id}')" style="color:red; background:none; border:none;"><i class="fas fa-user-minus"></i></button>
-            </div>
-        `).join('');
+            </div>`).join('');
         document.getElementById('admin-houses-list').innerHTML = allHouses.map(h => `
             <div class="admin-list-item">
                 <div><b>${h.name}</b></div>
@@ -575,10 +559,8 @@
                     <button onclick="adminAction('${h.id}', 'app')" style="background:${h.approved?'var(--green)':'#ddd'}"><i class="fas fa-eye"></i></button>
                     <button onclick="adminDelHouse('${h.id}')" style="background:var(--red)"><i class="fas fa-trash"></i></button>
                 </div>
-            </div>
-        `).join('');
+            </div>`).join('');
     }
-
     async function adminAction(id, type) {
         const h = allHouses.find(x => x.id === id);
         const update = {};
@@ -587,13 +569,11 @@
         if(type === 'app') update.approved = !h.approved;
         await db.collection('houses').doc(id).update(update);
     }
-
     function toggleLike(id) {
         likedHouses.includes(id) ? likedHouses = likedHouses.filter(i => i !== id) : likedHouses.push(id);
         localStorage.setItem('keja_liked', JSON.stringify(likedHouses));
         renderMarket(); renderLikes();
     }
-
     function renderLikes() {
         const list = document.getElementById('likes-list'); list.innerHTML = "";
         allHouses.filter(h => likedHouses.includes(h.id)).forEach(h => {
@@ -601,17 +581,16 @@
         });
     }
 
+    // UTILS
     function adminDelHouse(id) { if(confirm("Delete Listing?")) db.collection('houses').doc(id).delete(); }
     function adminDelUser(id) { if(confirm("Delete User?")) db.collection('users').doc(id).delete(); }
     function togglePassVisibility() { const p = document.getElementById('auth-pass'); p.type = p.type === "password" ? "text" : "password"; }
-    
     function toggleAuthMode() { 
         const f = document.getElementById('registration-fields'), t = document.getElementById('toggle-text'), b = document.getElementById('auth-btn');
         f.style.display = f.style.display === 'none' ? 'block' : 'none';
         t.innerText = f.style.display === 'none' ? 'Create New Account' : 'Already have an account?';
         b.innerText = f.style.display === 'none' ? 'Sign In' : 'Sign Up';
     }
-
     async function handleAuth() {
         const email = document.getElementById('auth-email').value, pass = document.getElementById('auth-pass').value;
         const isReg = document.getElementById('registration-fields').style.display === 'block';
@@ -622,17 +601,17 @@
             } else await auth.signInWithEmailAndPassword(email, pass);
         } catch(e) { alert(e.message); }
     }
-
     function switchView(view) {
         document.querySelectorAll('.view-pane').forEach(v => v.style.display = 'none');
         document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
         const targetView = document.getElementById('view-' + view);
         const targetTab = document.getElementById('tab-' + view);
         if(targetView) targetView.style.display = 'block';
-        if(targetTab) targetTab.classList.add('active');
+        if(view === 'landlord') document.getElementById('nav-landlord-tab').classList.add('active');
+        else if(view === 'admin') document.getElementById('nav-admin-tab').classList.add('active');
+        else if(targetTab) targetTab.classList.add('active');
         window.scrollTo(0,0);
     }
-
     function closeModal() { document.getElementById('houseModal').style.display = 'none'; }
     function resetPassword() { const e = prompt("Enter email:"); if(e) auth.sendPasswordResetEmail(e).then(() => alert("Reset email sent!")); }
     function requestFeature() { window.open(`https://wa.me/254720680769?text=Feature Request: `); }
