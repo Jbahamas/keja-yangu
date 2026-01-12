@@ -6,8 +6,8 @@
     <title>Keja Yangu Murang'a | Student Housing Portal</title>
     
     <meta name="description" content="Keja Yangu Murang'a is the premier student housing portal for Murang'a University students. Find affordable bedsitters, single rooms, and roommates near MUT gate.">
-    <meta name="keywords" content="Murang'a University hostels, MUT housing, student accommodation Muranga, Keja Yangu">
-    
+    <meta name="keywords" content="Murang'a University hostels, MUT housing, student accommodation Muranga, Keja Yangu, bedsitters in Muranga">
+    <meta name="author" content="Jonah Gathu">
     <link rel="canonical" href="https://www.kejayangumuranga.co.ke/">
     <link rel="icon" type="image/png" href="https://i.ibb.co/3mKNG8nV/House-logo.png">
     
@@ -63,6 +63,7 @@
         input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1.5px solid #cbd5e1; border-radius: 12px; box-sizing: border-box; font-family: inherit; font-size: 16px; }
         
         .btn-gold { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: 800; background: linear-gradient(135deg, var(--gold), var(--gold-hover)); color: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; }
+        .btn-gold:disabled { background: #cbd5e1; cursor: not-allowed; }
         .btn-outline { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid var(--navy); font-weight: 800; background: transparent; margin-top: 8px; cursor: pointer; }
 
         .h-card { background: var(--white); border-radius: 20px; overflow: hidden; margin-bottom: 25px; border: 1px solid #e2e8f0; position: relative; cursor: pointer; }
@@ -105,7 +106,6 @@
         .roommate-card { background: white; border-radius: 15px; padding: 15px; margin-bottom: 15px; border: 1px solid #e2e8f0; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .roommate-card:hover { border-color: var(--gold); }
 
-        /* Welcome Message Styling */
         #welcome-msg { color: var(--gold); font-weight: 800; font-size: 1.1rem; margin-bottom: 5px; display: none; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -114,9 +114,7 @@
 <body>
 
 <div id="loader"><div class="spinner"></div><p style="margin-top:10px; font-weight:bold;">Keja Yangu is Loading...</p></div>
-
 <div id="refresh-indicator"><i class="fas fa-sync fa-spin"></i> Updating listings...</div>
-
 <a id="support-btn" href="https://wa.me/254720680769" target="_blank" class="support-fab"><i class="fab fa-whatsapp"></i></a>
 
 <div id="houseModal" class="modal" onclick="closeModal()">
@@ -182,8 +180,7 @@
             </div>
             <div class="legal-disclaimer">
                 <b>Legal Disclaimer & Terms:</b><br>
-                Keja Yangu Murang'a is an independent portal developed by Jonah Gathu. We are not liable for payments or agreements made between students and landlords. 
-                Users are strictly advised to <b>physically verify</b> a room before any money is exchanged.
+                Keja Yangu Murang'a is an independent portal developed by Jonah Gathu. Users are strictly advised to <b>physically verify</b> a room before any money is exchanged.
             </div>
             <div class="jonah-brand">Platform by <b>Jonah Gathu</b></div>
         </div>
@@ -264,7 +261,12 @@
             </button>
             <div id="upload-preview"></div>
 
-            <button onclick="saveNewHostel()" class="btn-gold">Publish Listing</button>
+            <div style="display:flex; gap:10px; align-items:flex-start; margin:15px 0; font-size:0.85rem;">
+                <input type="checkbox" id="terms-agree" style="width:20px; height:20px; margin:0;" onchange="document.getElementById('publish-btn').disabled = !this.checked">
+                <span>I agree to the <b onclick="switchView('terms')" style="color:var(--blue); cursor:pointer;">Terms & Conditions</b> and verify that all information provided is accurate.</span>
+            </div>
+
+            <button id="publish-btn" onclick="saveNewHostel()" class="btn-gold" disabled>Publish Listing</button>
             <button onclick="requestPromotion()" class="btn-gold" style="background:var(--navy);"><i class="fas fa-rocket"></i> Request "Hot Deal" Promo</button>
         </div>
         <h4 style="margin-top:20px;">My Published Listings</h4>
@@ -274,11 +276,10 @@
     <section id="view-settings" class="view-pane">
         <div class="card">
             <h3>About Keja Yangu</h3>
-            <p style="font-size:0.9rem; line-height:1.5; color:var(--slate);">
-                Keja Yangu Murang'a is the ultimate student housing portal designed exclusively for the Murang'a University community. Our mission is to bridge the gap between students looking for comfortable housing and landlords offering quality rooms. 
-                <br><br>
-                We simplify the house-hunting process by providing verified listings, distance calculations, and direct contact with landlords—all in one place.
+            <p style="font-size:0.9rem; line-height:1.6; color:var(--slate);">
+                Keja Yangu Murang'a is a premier student housing portal developed by <b>Jonah Gathu</b> for the Murang'a University community. We bridge the gap between students and landlords through verified listings and a seamless user experience.
             </p>
+            <button class="btn-outline" onclick="switchView('terms')">View Terms of Service</button>
         </div>
 
         <div class="card">
@@ -291,6 +292,19 @@
             <h4>Support</h4>
             <p style="font-size:0.9rem;">Facing issues? Contact Jonah Gathu directly.</p>
             <button class="btn-gold" onclick="window.open('https://wa.me/254720680769')"><i class="fab fa-whatsapp"></i> Chat Developer</button>
+        </div>
+    </section>
+
+    <section id="view-terms" class="view-pane">
+        <div class="card">
+            <h3 style="margin-top:0;"><i class="fas fa-gavel"></i> Terms & Conditions</h3>
+            <div style="font-size:0.85rem; line-height:1.6; color:var(--slate); max-height:400px; overflow-y:auto;">
+                <p><b>1. Introduction:</b> Keja Yangu Murang'a is an listing platform. We do not own or manage any properties listed.</p>
+                <p><b>2. Verification:</b> While we strive to verify listings, users are responsible for physically inspecting rooms before making payments.</p>
+                <p><b>3. Payments:</b> Never pay "booking fees" without seeing the room. Keja Yangu is not liable for financial losses resulting from transactions between users.</p>
+                <p><b>4. Accuracy:</b> Landlords must provide truthful data. False information will result in permanent account suspension.</p>
+            </div>
+            <button class="btn-gold" onclick="switchView('settings')">Back to Settings</button>
         </div>
     </section>
 
@@ -321,6 +335,7 @@
 </nav>
 
 <script>
+    // CORE CONFIGURATION - INTEGRITY MAINTAINED
     const firebaseConfig = {
         apiKey: "AIzaSyCC8SA7FKzikzHwvA9A6dyrv0x2jguyPPQ",
         authDomain: "murang-a-student-housing.firebaseapp.com",
@@ -352,7 +367,7 @@
         }
     }, { passive: true });
 
-    // PWA
+    // PWA LOGIC
     let deferredPrompt;
     const installBtn = document.getElementById('install-pwa');
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -396,7 +411,7 @@
         renderUploadPreviews();
     }
 
-    // AUTH OBSERVER
+    // AUTH OBSERVER - INTEGRITY MAINTAINED
     auth.onAuthStateChanged(async user => {
         document.getElementById('loader').style.display = 'none';
         if(user) {
@@ -405,7 +420,6 @@
             document.getElementById('support-btn').style.display = 'flex';
             document.getElementById('settings-email').innerText = user.email;
             
-            // ADDED: Welcome Message Display
             const welcomeBox = document.getElementById('welcome-msg');
             welcomeBox.style.display = 'block';
             welcomeBox.innerText = `Welcome back, ${user.email.split('@')[0]}! 👋`;
@@ -428,6 +442,7 @@
         }
     });
 
+    // LISTENERS - INTEGRITY MAINTAINED
     function loadData() {
         db.collection('houses').orderBy('createdAt', 'desc').onSnapshot(snap => {
             allHouses = snap.docs.map(d => ({id: d.id, ...d.data()}));
@@ -492,7 +507,7 @@
     // MARKET
     function renderMarket() {
         const mList = document.getElementById('market-list'), fList = document.getElementById('featured-list'), pSec = document.getElementById('premium-section');
-        const q = document.getElementById('search-input').value.toLowerCase();
+        const q = (document.getElementById('search-input').value || "").toLowerCase();
         const typeFilter = document.getElementById('filter-type').value;
         const priceFilter = document.getElementById('filter-price').value;
         const distFilter = document.getElementById('filter-dist').value;
@@ -578,7 +593,7 @@
         await db.collection('houses').doc(id).update({isVacant: !(h.isVacant !== false)});
     }
     function renderAdminData() {
-        const userQ = document.getElementById('admin-user-search').value.toLowerCase();
+        const userQ = (document.getElementById('admin-user-search').value || "").toLowerCase();
         document.getElementById('stat-houses').innerText = allHouses.length;
         document.getElementById('stat-earnings').innerText = (allHouses.filter(h => h.featured).length * FEATURE_PRICE).toLocaleString();
         document.getElementById('stat-users').innerText = allUsers.length;
