@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Keja Yangu Murang'a | Student Housing Portal</title>
     
+    <meta name="description" content="Keja Yangu Murang'a is the premier student housing portal for Murang'a University students. Find affordable bedsitters, single rooms, and roommates near MUT gate.">
+    <meta name="keywords" content="Murang'a University hostels, MUT housing, student accommodation Muranga, Keja Yangu">
+    
     <link rel="canonical" href="https://www.kejayangumuranga.co.ke/">
     <link rel="icon" type="image/png" href="https://i.ibb.co/3mKNG8nV/House-logo.png">
     
@@ -102,6 +105,9 @@
         .roommate-card { background: white; border-radius: 15px; padding: 15px; margin-bottom: 15px; border: 1px solid #e2e8f0; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .roommate-card:hover { border-color: var(--gold); }
 
+        /* Welcome Message Styling */
+        #welcome-msg { color: var(--gold); font-weight: 800; font-size: 1.1rem; margin-bottom: 5px; display: none; }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -152,6 +158,8 @@
 </header>
 
 <div class="container">
+    <div id="welcome-msg"></div>
+
     <section id="view-auth" class="view-pane" style="display: block;">
         <div class="card">
             <h2 style="margin:0;">Keja Yangu Murang'a</h2>
@@ -264,6 +272,15 @@
     </section>
 
     <section id="view-settings" class="view-pane">
+        <div class="card">
+            <h3>About Keja Yangu</h3>
+            <p style="font-size:0.9rem; line-height:1.5; color:var(--slate);">
+                Keja Yangu Murang'a is the ultimate student housing portal designed exclusively for the Murang'a University community. Our mission is to bridge the gap between students looking for comfortable housing and landlords offering quality rooms. 
+                <br><br>
+                We simplify the house-hunting process by providing verified listings, distance calculations, and direct contact with landlords—all in one place.
+            </p>
+        </div>
+
         <div class="card">
             <h3>Account Settings</h3>
             <p>Email: <b id="settings-email"></b></p>
@@ -388,6 +405,11 @@
             document.getElementById('support-btn').style.display = 'flex';
             document.getElementById('settings-email').innerText = user.email;
             
+            // ADDED: Welcome Message Display
+            const welcomeBox = document.getElementById('welcome-msg');
+            welcomeBox.style.display = 'block';
+            welcomeBox.innerText = `Welcome back, ${user.email.split('@')[0]}! 👋`;
+
             const userDoc = await db.collection('users').doc(user.uid).get();
             const role = user.email === ADMIN_EMAIL ? 'admin' : (userDoc.exists ? userDoc.data().role : 'student');
             
@@ -402,6 +424,7 @@
         } else { 
             switchView('auth'); 
             document.getElementById('main-nav').style.display = 'none'; 
+            document.getElementById('welcome-msg').style.display = 'none';
         }
     });
 
